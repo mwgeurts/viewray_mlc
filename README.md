@@ -2,6 +2,7 @@ ViewRay MLC Position Check
 ===========
 
 Author: Mark Geurts, mark.w.geurts@gmail.com
+
 Copyright (C) 2014 University of Wisconsin Board of Regents
 
 AnalyzeMLCProfiles loads Monte Carlo treatment planning data from the ViewRay TPS and compares it to measured Sun Nuclear IC Profiler data.  To successfully process the data, six exposures must be acquired for a given head and gantry angle at the following MLC X1 and X2 positions (in cm):

@@ -59,7 +59,6 @@ else
 end
 % End initialization code - DO NOT EDIT
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function AnalyzeMLCProfiles_OpeningFcn(hObject, ~, handles, varargin)
 % This function has no output args, see OutputFcn.
@@ -152,10 +151,6 @@ function h1angle1_Callback(~, ~, ~)
 % hObject    handle to h1angle1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns h1angle1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from h1angle1
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function h1angle1_CreateFcn(hObject, ~, ~)

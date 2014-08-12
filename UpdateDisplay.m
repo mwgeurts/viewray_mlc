@@ -113,6 +113,7 @@ switch get(handles.([head, 'display']),'Value')
         % Finish specifying plot
         hold off;
         xlabel('Profile');
+        set(gca,'XTick', 1:1:6);
         set(gca,'XTickLabel',{'-10cm', '-6cm', '-2cm', '2cm', '6cm', '10cm'});
         ylabel('Field Edge Difference (mm)');
         ylim([-3 3]);
@@ -155,6 +156,7 @@ switch get(handles.([head, 'display']),'Value')
         % Finish specifying plot
         hold off;
         xlabel('Profile');
+        set(gca,'XTick', 1:1:6);
         set(gca,'XTickLabel',{'-10cm', '-6cm', '-2cm', '2cm', '6cm', '10cm'});
         ylabel('FWHM Difference (mm)');
         ylim([-3 3]);

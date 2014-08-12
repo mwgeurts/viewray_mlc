@@ -28,7 +28,7 @@ function handles = LoadSNCProfiles(handles, head, file)
 % with this program. If not, see http://www.gnu.org/licenses/.
 
 % Request the user to select the SNC IC Profiler measurements
-[path, name] = uigetfile('*.txt', ...
+[name, path] = uigetfile('*.txt', ...
     'Select an SNC Exported MLC Check Measurement Set', handles.path);
 
 % If a file was selected
@@ -37,7 +37,7 @@ if ~name == 0
     handles.path = path;
     
     % Update text box
-    set(handles.([head,'file',file]), 'String', fullfile(name, path));
+    set(handles.([head,'file',file]), 'String', fullfile(path, name));
     
     % Check if an angle was selected
     if get(handles.([head,'angle',file]), 'Value') == 1
@@ -54,7 +54,7 @@ if ~name == 0
     % Extract profiles
     [handles.([head,'profiles',file]), handles.([head,'FWHM',file]), ...
         handles.([head,'X1',file]), handles.([head,'X2',file])] ...
-        = ParseSNCProfiles(fullfile(name, path), ...
+        = ParseSNCProfiles(fullfile(path, name), ...
         get(handles.([head,'angle',file]), 'Value'));
     
     % Select Reference Profile

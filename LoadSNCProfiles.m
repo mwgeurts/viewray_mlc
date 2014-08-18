@@ -58,7 +58,7 @@ if ~name == 0
         get(handles.([head,'angle',file]), 'Value'));
     
     % Select Reference Profile
-    switch get(handles.h1angle1, 'Value')
+    switch get(handles.([head,'angle',file]), 'Value')
         % 0 degrees
         case 2
             handles.([head,'refprofiles',file]) = handles.MCap;

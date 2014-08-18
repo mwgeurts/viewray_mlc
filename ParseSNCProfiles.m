@@ -27,7 +27,7 @@ function [profiles, FWHM, X1, X2] = ParseSNCProfiles(file, angle)
 % You should have received a copy of the GNU General Public License along 
 % with this program. If not, see http://www.gnu.org/licenses/.
 
-%% Load ured data
+%% Load measured data
 % Open a file handle to the ured data
 fid = fopen(file, 'r');
 
@@ -59,6 +59,9 @@ while ~feof(fid)
         break;
     end
 end
+
+% Close file handle
+fclose(fid);
 
 % Convert positions from cm to mm
 measX{1} = measX{1} * 10;

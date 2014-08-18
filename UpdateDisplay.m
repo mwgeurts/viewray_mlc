@@ -94,7 +94,9 @@ switch get(handles.([head, 'display']),'Value')
                     'Color', cmap(c,:));
 
                 % Add legend entry for X1
-                names{c} = sprintf('X1 Dataset %i', i);
+                names{c} = sprintf('%i X1', ...
+                    (get(handles.(sprintf('%sangle%i', head, i)), ...
+                    'Value') - 2) * 90);
                 
                 % Increment the counter
                 c = c + 1;
@@ -105,7 +107,9 @@ switch get(handles.([head, 'display']),'Value')
                     'Color', cmap(c,:));
 
                 % Add legend entry for X2
-                names{c} = sprintf('X2 Dataset %i', i);
+                names{c} = sprintf('%i X2', ...
+                    (get(handles.(sprintf('%sangle%i', head, i)), ...
+                    'Value') - 2) * 90);
 
             end 
         end

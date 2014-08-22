@@ -89,7 +89,8 @@ switch get(handles.([head, 'display']),'Value')
                 c = c + 1;
                 
                 % Plot the X1 field edge difference from reference
-                plot(handles.(sprintf('%sX1%i', head, i)) - ...
+                plot(handles.(sprintf('%srefX1%i', head, i)), ...
+                    handles.(sprintf('%sX1%i', head, i)) - ...
                     handles.(sprintf('%srefX1%i', head, i)), '-o', ...
                     'Color', cmap(c,:));
 
@@ -102,7 +103,8 @@ switch get(handles.([head, 'display']),'Value')
                 c = c + 1;
                 
                 % Plot the X2 field edge difference from reference
-                plot(handles.(sprintf('%sX2%i', head, i)) - ...
+                plot(handles.(sprintf('%srefX2%i', head, i)), ...
+                    handles.(sprintf('%sX2%i', head, i)) - ...
                     handles.(sprintf('%srefX2%i', head, i)), '-o', ...
                     'Color', cmap(c,:));
 
@@ -116,9 +118,8 @@ switch get(handles.([head, 'display']),'Value')
         
         % Finish specifying plot
         hold off;
-        xlabel('Profile');
-        set(gca,'XTick', 1:1:6);
-        set(gca,'XTickLabel',{'-10cm', '-6cm', '-2cm', '2cm', '6cm', '10cm'});
+        xlabel('Field Edge (mm)');
+        xlim([-125 125]);
         ylabel('Field Edge Difference (mm)');
         ylim([-3 3]);
         if c > 0
@@ -152,8 +153,10 @@ switch get(handles.([head, 'display']),'Value')
                     handles.(sprintf('%srefFWHM%i', head, i)), '-o', ...
                     'Color', cmap(c,:));
 
-                % Add legend entry for this dataset
-                names{c} = sprintf('Dataset %i', i);
+                 % Add legend entry
+                names{c} = sprintf('%i', ...
+                    (get(handles.(sprintf('%sangle%i', head, i)), ...
+                    'Value') - 2) * 90);
             end 
         end
         
@@ -161,7 +164,6 @@ switch get(handles.([head, 'display']),'Value')
         hold off;
         xlabel('Profile');
         set(gca,'XTick', 1:1:6);
-        set(gca,'XTickLabel',{'-10cm', '-6cm', '-2cm', '2cm', '6cm', '10cm'});
         ylabel('FWHM Difference (mm)');
         ylim([-3 3]);
         if c > 0

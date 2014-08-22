@@ -105,6 +105,10 @@ for i = 1:6
             profiles = measY;
     end
     
+    % Resort data ascending
+    [x, I] = sort(x);
+    y = y(I);
+    
     % Determine location and value of maximum
     [C, I] = max(y);
     

@@ -73,7 +73,7 @@ for i = 1:6
    measY{i+1} = measY{i+1} / 100;
 end
 
-%% Process and compare each profiles.ured profile
+%% Process each measured profile
 % Initialize ured profile data
 X1 = zeros(1,6);
 X2 = zeros(1,6);
@@ -95,12 +95,12 @@ for i = 1:6
             profiles = measY;
         % 180 degrees
         case 4
-            x = measY{1};
+            x = -measY{1};
             y = measY{i+1};
             profiles = measY;
         % 270 degrees
         case 5
-            x = measY{1};
+            x = -measY{1};
             y = measY{i+1};
             profiles = measY;
     end

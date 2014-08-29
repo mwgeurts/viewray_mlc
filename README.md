@@ -20,7 +20,7 @@ When measuring data with IC Profiler, it is assumed that the profiler will be po
 
 The following steps illustrate how to acquire and process 90 and 270 degree measurements.  
 
-# Set up the IC Profiler
+## Set up the IC Profiler
 
 1. Attach the SNC IC Profiler to the IC Profiler jig.
 2. Connect the IC Profiler to the Physics Workstation using the designated cable.
@@ -29,7 +29,7 @@ The following steps illustrate how to acquire and process 90 and 270 degree meas
 5. Select the most recent array Calibration from the dropdown box.
 6. Verify the mode is continuous by clicking the Control menu.
 
-# Orient the IC Profiler in the Sagittal Position
+## Orient the IC Profiler in the Sagittal Position
 
 1. Place the SNC Profiler jig on the couch at virtual isocenter and orient the jig in the Sagittal orientation, as shown.
   1. The top of the profiler will be facing the IEC+X axis.
@@ -78,7 +78,7 @@ The following steps illustrate how to acquire and process 90 and 270 degree meas
 20. Once both axes are within specification, continue below to deliver the six MLC fields.
 21. Record the final couch positions. If the system must be restarted, the couch should be verified before continuing.
 
-# Collect MLC Data
+## Collect MLC Data
 
 1.	On the ViewRay TPDS, select Head 1 under Beam Setup and Controls.
 2.	Set Delivery Angle to 90 degrees.
@@ -107,7 +107,7 @@ The following steps illustrate how to acquire and process 90 and 270 degree meas
   1.	In the message box that appears, verify the default settings are selected and specify a destination file.
 16. Repeat the steps above for Head 2 and Head 3, both at 270 degrees.
 
-# Analyze MLC Data
+## Analyze MLC Data
 
 1. Execute the AnalyzeMLCProfiles.m MATLAB script.
 2. Under Head 1, click Browse to load the SNC IC Profiler ASCII export for the first gantry angle.

@@ -115,3 +115,7 @@ The following steps illustrate how to acquire and process 90 and 270 degree meas
 5. Review the resulting profile comparisons and edge offset plots, as shown in the example.
   1. Verify that each profile looks as expected and that no data points (particularly those around the FWHM limits) appear distorted due to noise or measurement error.
   2. Verify that each X1 and X2 field edge differences are within +/- 2 mm for all six positions. The minimum and maximum deviations are listed in the statistics table at the bottom.
+
+## Compatibility and Requirements
+
+This tool has been tested with ViewRay version 3.5 treatment software, Sun Nuclear IC Profiler software version 3.3.1.31111, and MATLAB R2014a.  The Parallel Computing toolbox and a CUDA-compatible GPU are required to run GPU based interpolation (CPU interpolation is automatically supported if not present).

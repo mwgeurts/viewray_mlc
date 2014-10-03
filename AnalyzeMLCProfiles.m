@@ -92,10 +92,6 @@ set(handles.h3table, 'Data', cell(8,4));
 % Initialize global variables
 handles.path = userpath;
 
-% Declare the nominal X1/X2 values (in mm) for each exposure
-handles.nomX1 = [-125 -85 -45 -5 35 75];
-handles.nomX2 = [-75 -35 5 45 85 125];
-
 % Load reference profiles
 handles = LoadReferenceProfiles(handles);
 

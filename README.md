@@ -19,12 +19,17 @@ When measuring data with IC Profiler, it is assumed that the profiler will be po
 
 ## Contents
 
+* [Installation and Use](README.md#installation-and-use)
 * [Measurement Instructions](README.md#measurement-instructions)
   * [Set up the IC Profiler](README.md#set-up-the-ic-profiler)  
   * [Orient the IC Profiler in the Sagittal Position](README.md#orient-the-ic-profiler-in-the-sagittal-position)
   * [Collect MLC Data](README.md#Collect-mlc-data)
   * [Analyze MLC Data](README.md#Analyze-mlc-data)
 * [Compatibility and Requirements](README.md#compatibility-and-requirements)
+
+## Installation and Use
+
+To run this application, copy all MATLAB .m and .fig and the `Reference` folder contents into a directory with read/write access and then execute AnalyzeMLCProfiles.m.  Global configuration variables such as the default brose path can be modified by changing the values in `AnalyzeMLCProfiles_OpeningFcn` prior to execution.  A log file will automatically be created in the same directory and can be used for troubleshooting.  For instructions on acquiring the input data, see [Measurement Instructions](README.md#measurement-instructions). For information about software version and configuration pre-requisities, see [Compatibility and Requirements](README.md#compatibility-and-requirements).
 
 ## Measurement Instructions
 

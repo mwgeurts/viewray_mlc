@@ -112,8 +112,8 @@ The following steps illustrate how to acquire and process 90 and 270 degree meas
   7.	Under Description, type Head #, where # is the head number (1 in this instance)
   8.	Click OK
   9.	When asked to save the file, choose Multi-Frame type and save the results to _H1 G90 Strip1.prm_
-14.	Repeat measurements at the same head and gantry angle for the remaining strips, using the field sizes below
-15.	In the SNC IC Profiler software, After completing all six exposures, export the data to ASCII format by selecting Export > SNC ASCII
+14.	Repeat measurements at the same head and gantry angle for the remaining strips, using the field sizes in the above table
+15.	In the SNC IC Profiler software, after completing all six exposures, export the data to ASCII format by selecting Export > SNC ASCII
   1.	In the message box that appears, verify the default settings are selected and specify a destination file
 16. Repeat the steps above for Head 2 and Head 3, both at 270 degrees
 

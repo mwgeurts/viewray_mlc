@@ -25,6 +25,7 @@ When measuring data with IC Profiler, it is assumed that the profiler will be po
   * [Orient the IC Profiler in the Sagittal Position](README.md#orient-the-ic-profiler-in-the-sagittal-position)
   * [Collect MLC Data](README.md#Collect-mlc-data)
   * [Analyze MLC Data](README.md#Analyze-mlc-data)
+* [Gamma Computation Methods](README.md#Gamma-computation-methods)
 * [Compatibility and Requirements](README.md#compatibility-and-requirements)
 
 ## Installation and Use
@@ -132,6 +133,29 @@ The following steps illustrate how to acquire and process 90 and 270 degree meas
   1. Verify that each profile looks as expected and that no data points (particularly those around the FWHM limits) appear distorted due to noise or measurement error
   2. Verify that each X1 and X2 field edge differences are within +/- 2 mm for all six positions
   3. The minimum and maximum deviations are listed in the statistics table at the bottom
+
+## Gamma Computation Methods
+
+The Gamma analysis is performed based on the formalism presented by D. A. Low et. al., [A technique for the quantitative evaluation of dose distributions.](http://www.ncbi.nlm.nih.gov/pubmed/9608475), Med Phys. 1998 May; 25(5): 656-61.  In this formalism, the Gamma quality index *&gamma;* is defined as follows for each point along the measured profile *Rm* given the reference profile *Rc*:
+
+*&gamma; = min{&Gamma;(Rm,Rc}&forall;{Rc}*
+
+where:
+
+*&Gamma; = &radic; (r^2(Rm,Rc)/&Delta;dM^2 + &delta;^2(Rm,Rc)/&Delta;DM^2)*,
+
+*r(Rm,Rc) = | Rc - Rm |*,
+
+*&delta;(Rm,Rc) = Dc(Rc) - Dm(Rm)*,
+
+*Dc(Rc)* and *Dm(Rm)* represent the reference and measured signal at each *Rc* and *Rm*, respectively, and
+
+*&Delta;dM* and *&Delta;DM* represent the absolute and Distance To Agreement Gamma criterion (by default 2%/1mm), respectively.  
+
+The absolute criterion is typically given in percent and can refer to a percent of the maximum dose (commonly called the global method) or a percentage of the voxel *Rm* being evaluated (commonly called the local method).  The application is capable of computing gamma using either approach, and can be set when calling CalcGamma.m by passing a boolean value of 1 (for local) or 0 (for global).  By default, the global method (0) is used.
+
+The computation applied in the tool is the 1D algorithm, in that the distance to agreement criterion is evaluated only along the dimension of the reference profile when determining *min{&Gamma;(Rm,Rc}&forall;{Rc}*. To accomplish this, the reference profile is shifted relative to the measured profile using linear 1D CUDA (when available) interpolation.  For each shift, *&Gamma;(Rm,Rc}* is computed, and the minimum value *&gamma;* is determined.  To improve computation efficiency, the computation space *&forall;{Rc}* is limited to twice the distance to agreement parameter.  Thus, the maximum "real" Gamma index returned by the application is 2.
+
 
 ## Compatibility and Requirements
 

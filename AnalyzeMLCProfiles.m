@@ -160,12 +160,20 @@ function h1browse1_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H1 angle 1 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h1', '1');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h1');
 
+% Log event
+Event(sprintf('H1 angle 1 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
+    
 % Update handles structure
 guidata(hObject, handles);
 
@@ -213,11 +221,19 @@ function h1browse2_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H1 angle 2 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h1', '2');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h1');
+
+% Log event
+Event(sprintf('H1 angle 2 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -266,11 +282,19 @@ function h1browse3_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H1 angle 3 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h1', '3');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h1');
+
+% Log event
+Event(sprintf('H1 angle 3 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -319,11 +343,19 @@ function h1browse4_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H1 angle 4 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h1', '4');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h1');
+
+% Log event
+Event(sprintf('H1 angle 4 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -353,6 +385,9 @@ function h1display_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H1 display dropdown changed');
+
 % Call UpdateDisplay to update plot
 handles = UpdateDisplay(handles, 'h1');
 
@@ -378,10 +413,15 @@ function h1clear_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H1 clear all button selected');
+
 % Loop through each dataset
 for i = 1:4
     set(handles.(sprintf('h1angle%i', i)), 'Value', 1);
     set(handles.(sprintf('h1file%i', i)), 'String', '');
+    handles.(sprintf('h1profiles%i', i)) = cell();
+    handles.(sprintf('h1gamma%i', i)) = cell();
 end
 
 % Call UpdateDisplay to clear plot
@@ -389,6 +429,9 @@ handles = UpdateDisplay(handles, 'h1');
 
 % Set table data
 set(handles.h1table, 'Data', cell(8,4));
+
+% Log event
+Event('H1 data cleared from memory');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -418,11 +461,19 @@ function h3browse1_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H3 angle 1 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h3', '1');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h3');
+
+% Log event
+Event(sprintf('H3 angle 1 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -446,18 +497,25 @@ if ispc && isequal(get(hObject,'BackgroundColor'), ...
     set(hObject,'BackgroundColor','white');
 end
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function h3browse2_Callback(hObject, ~, handles)
 % hObject    handle to h3browse2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H3 angle 2 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h3', '2');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h3');
+
+% Log event
+Event(sprintf('H3 angle 2 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -487,11 +545,19 @@ function h3browse3_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H3 angle 3 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h3', '3');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h3');
+
+% Log event
+Event(sprintf('H3 angle 3 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -540,11 +606,19 @@ function h3browse4_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H3 angle 4 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h3', '4');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h3');
+
+% Log event
+Event(sprintf('H3 angle 4 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -574,6 +648,9 @@ function h3display_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H3 display dropdown changed');
+
 % Call UpdateDisplay to update plot
 handles = UpdateDisplay(handles, 'h3');
 
@@ -599,10 +676,15 @@ function h3clear_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H3 clear all button selected');
+
 % Loop through each dataset
 for i = 1:4
     set(handles.(sprintf('h3angle%i', i)), 'Value', 1);
     set(handles.(sprintf('h3file%i', i)), 'String', '');
+    handles.(sprintf('h3profiles%i', i)) = cell();
+    handles.(sprintf('h3gamma%i', i)) = cell();
 end
 
 % Call UpdateDisplay to clear plot
@@ -610,6 +692,9 @@ handles = UpdateDisplay(handles, 'h3');
 
 % Set table data
 set(handles.h3table, 'Data', cell(8,4));
+
+% Log event
+Event('H3 data cleared from memory');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -676,11 +761,19 @@ function h2browse1_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H2 angle 1 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h2', '1');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h2');
+
+% Log event
+Event(sprintf('H2 angle 1 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -710,11 +803,19 @@ function h2browse2_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H2 angle 2 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h2', '2');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h2');
+
+% Log event
+Event(sprintf('H2 angle 2 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -744,11 +845,19 @@ function h2browse3_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H2 angle 3 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h2', '3');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h2');
+
+% Log event
+Event(sprintf('H2 angle 3 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -797,11 +906,19 @@ function h2browse4_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H2 angle 4 browse button selected');
+t = tic;
+
 % Load profile data
 handles = LoadSNCProfiles(handles, 'h2', '4');
 
 % Update plot
 handles = UpdateDisplay(handles, 'h2');
+
+% Log event
+Event(sprintf('H2 angle 4 data loaded successfully in %0.3f seconds', toc(t)));
+clear t;
 
 % Update handles structure
 guidata(hObject, handles);
@@ -831,6 +948,9 @@ function h2display_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H2 display dropdown changed');
+
 % Call UpdateDisplay to update plot
 handles = UpdateDisplay(handles, 'h2');
 
@@ -856,10 +976,15 @@ function h2clear_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Log event
+Event('H2 clear all button selected');
+
 % Loop through each dataset
 for i = 1:4
     set(handles.(sprintf('h2angle%i', i)), 'Value', 1);
     set(handles.(sprintf('h2file%i', i)), 'String', '');
+    handles.(sprintf('h2profiles%i', i)) = cell();
+    handles.(sprintf('h2gamma%i', i)) = cell();
 end
 
 % Call UpdateDisplay to clear plot
@@ -867,6 +992,9 @@ handles = UpdateDisplay(handles, 'h2');
 
 % Set table data
 set(handles.h2table, 'Data', cell(8,4));
+
+% Log event
+Event('H2 data cleared from memory');
 
 % Update handles structure
 guidata(hObject, handles);

@@ -24,6 +24,9 @@ function varargout = UpdateDisplay(varargin)
 % You should have received a copy of the GNU General Public License along 
 % with this program. If not, see http://www.gnu.org/licenses/.
 
+% Run in try-catch to log error via Event.m
+try
+    
 % Specify plot options and order
 plotoptions = {
     ''
@@ -37,6 +40,7 @@ plotoptions = {
 
 % If no input arguments are provided
 if nargin == 0
+    
     % Return the plot options
     varargout{1} = plotoptions;
     
@@ -45,17 +49,24 @@ if nargin == 0
     
 % Otherwise, if 2, set the input variables and update the plot
 elseif nargin == 2
+    
+    % Set input variables
     handles = varargin{1};
     head = varargin{2};
     
+    % Log start
+    Event('Updating plot display');
+    tic;
+    
 % Otherwise, throw an error
 else 
-    error('Incorrect number of inputs');
+    Event('Incorrect number of inputs to UpdateDisplay', 'ERROR');
 end
 
 % Clear and set reference to axis
 cla(handles.([head, 'axes']), 'reset');
 axes(handles.([head, 'axes']));
+Event(['Current plot set to ', head, 'axes']);
 
 % Turn off the display while building
 set(allchild(handles.([head, 'axes'])), 'visible', 'off'); 
@@ -68,8 +79,12 @@ c = 0;
 
 % Execute code block based on display GUI item value
 switch get(handles.([head, 'display']),'Value')
+    
     % If the user selected Field Edge Offsets
     case 2
+        % Log selection
+        Event('Field Edge Offset selected for display');
+        
         % Initialize empty cell array for legend entries
         names = cell(0);
         
@@ -78,6 +93,7 @@ switch get(handles.([head, 'display']),'Value')
         
         % Loop through each dataset
         for i = 1:4
+            
             % If the dataset exists
             if ~strcmp(get(handles.(sprintf('%sfile%i', head, i)), 'String'), '') ...
                     && ~isempty(get(handles.(sprintf('%sfile%i', head, i)), 'String'))
@@ -130,6 +146,9 @@ switch get(handles.([head, 'display']),'Value')
         
     % If the user selected FWHM differences
     case 3
+        % Log selection
+        Event('FWHM differences selected for display');
+        
         % Initialize empty cell array for legend entries
         names = cell(0);
         
@@ -138,6 +157,7 @@ switch get(handles.([head, 'display']),'Value')
         
         % Loop through each dataset
         for i = 1:4
+            
             % If the dataset exists
             if ~strcmp(get(handles.(sprintf('%sfile%i', head, i)), 'String'), '') ...
                     && ~isempty(get(handles.(sprintf('%sfile%i', head, i)), 'String'))
@@ -174,6 +194,9 @@ switch get(handles.([head, 'display']),'Value')
     
     % If the user chooses to view the dataset 1 profiles 
     case 4
+        % Log selection
+        Event('Angle 1 profiles selected for display');
+        
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file1']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file1']), 'String'))
@@ -183,6 +206,7 @@ switch get(handles.([head, 'display']),'Value')
             
             % Loop through each reference profile
             for i = 1:length(handles.([head, 'refprofiles1']))
+                
                 % Plot normalized reference data
                 plot(handles.([head, 'refprofiles1']){i}.profile(1,:), ...
                     handles.([head, 'refprofiles1']){i}.profile(2,:) / ...
@@ -217,6 +241,9 @@ switch get(handles.([head, 'display']),'Value')
         
     % If the user chooses to view the dataset 2 profiles 
     case 5
+        % Log selection
+        Event('Angle 2 profiles selected for display');
+        
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file2']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file2']), 'String'))
@@ -226,6 +253,7 @@ switch get(handles.([head, 'display']),'Value')
             
             % Loop through each reference profile
             for i = 1:length(handles.([head, 'refprofiles2']))
+                
                 % Plot normalized reference data
                 plot(handles.([head, 'refprofiles2']){i}.profile(1,:), ...
                     handles.([head, 'refprofiles2']){i}.profile(2,:) / ...
@@ -260,6 +288,9 @@ switch get(handles.([head, 'display']),'Value')
         
     % If the user chooses to view the dataset 3 profiles 
     case 6
+        % Log selection
+        Event('Angle 3 profiles selected for display');
+        
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file3']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file3']), 'String'))
@@ -269,6 +300,7 @@ switch get(handles.([head, 'display']),'Value')
             
             % Loop through each reference profile
             for i = 1:length(handles.([head, 'refprofiles3']))
+                
                 % Plot normalized reference data
                 plot(handles.([head, 'refprofiles3']){i}.profile(1,:), ...
                     handles.([head, 'refprofiles3']){i}.profile(2,:) / ...
@@ -303,6 +335,9 @@ switch get(handles.([head, 'display']),'Value')
         
     % If the user chooses to view the dataset 4 profiles     
     case 7
+        % Log selection
+        Event('Angle 4 profiles selected for display');
+        
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file4']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file4']), 'String'))
@@ -312,6 +347,7 @@ switch get(handles.([head, 'display']),'Value')
             
             % Loop through each reference profile
             for i = 1:length(handles.([head, 'refprofiles4']))
+                
                 % Plot normalized reference data
                 plot(handles.([head, 'refprofiles4']){i}.profile(1,:), ...
                     handles.([head, 'refprofiles4']){i}.profile(2,:) / ...
@@ -345,5 +381,13 @@ switch get(handles.([head, 'display']),'Value')
         end
 end
 
+% Log completion
+Event(sprintf('Plot updated successfully in %0.3f seconds', toc));
+
 % Return the modified handles
 varargout{1} = handles;
+
+% Catch errors, log, and rethrow
+catch err
+    Event(getReport(err, 'extended', 'hyperlinks', 'off'), 'ERROR');
+end

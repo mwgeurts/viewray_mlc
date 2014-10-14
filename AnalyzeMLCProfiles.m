@@ -70,6 +70,27 @@ function AnalyzeMLCProfiles_OpeningFcn(hObject, ~, handles, varargin)
 % Choose default command line output for AnalyzeMLCProfiles
 handles.output = hObject;
 
+% Set version information.  See LoadVersionInfo for more details.
+handles.versionInfo = LoadVersionInfo;
+
+% Store program and MATLAB/etc version information as a string cell array
+string = {'ViewRay MLC Position Check'
+    sprintf('Version: %s', handles.versionInfo{6});
+    sprintf('Author: Mark Geurts <mark.w.geurts@gmail.com>');
+    sprintf('MATLAB Version: %s', handles.versionInfo{2});
+    sprintf('MATLAB License Number: %s', handles.versionInfo{3});
+    sprintf('Operating System: %s', handles.versionInfo{1});
+    sprintf('CUDA: %s', handles.versionInfo{4});
+    sprintf('Java Version: %s', handles.versionInfo{5})
+};
+
+% Add dashed line separators      
+separator = repmat('-', 1,  size(char(string), 2));
+string = sprintf('%s\n', separator, string{:}, separator);
+
+% Log information
+Event(string, 'INIT');
+
 % Turn off images
 set(allchild(handles.h1axes), 'visible', 'off'); 
 set(handles.h1axes, 'visible', 'off'); 
@@ -91,6 +112,12 @@ set(handles.h3table, 'Data', cell(8,4));
 
 % Initialize global variables
 handles.path = userpath;
+Event(['Default file path set to ', handles.path]);
+
+handles.abs = 2.0; % percent
+handles.dta = 1.0; % mm
+Event(sprintf('Gamma criteria set to %0.1f%%/%0.1f mm', ...
+    [handles.abs handles.dta]));
 
 % Load reference profiles
 handles = LoadReferenceProfiles(handles);
@@ -901,8 +928,8 @@ for i = 1:3
     
     % Update column widths to scale to new table size
     set(handles.(sprintf('h%itable', i)), 'ColumnWidth', ...
-        {floor(0.55*pos(3)) - 7 floor(0.15*pos(3)) ...
-        floor(0.15*pos(3)) floor(0.15*pos(3))});
+        {floor(0.50*pos(3)) - 24 floor(0.15*pos(3)) ...
+        floor(0.15*pos(3)) floor(0.2*pos(3))});
 end
 
 % Clear temporary variables

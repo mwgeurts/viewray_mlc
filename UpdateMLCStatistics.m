@@ -63,21 +63,21 @@ c = 0;
 
 % Compute minimum field edge offsets
 c = c + 1;
-table{c,1} = 'Min Field Edge Offset (mm)';
+table{c,1} = 'Min field edge offset (mm)';
 table{c,2} = sprintf('%0.2f', min(X1offsets));
 table{c,3} = sprintf('%0.2f', min(X2offsets));
 table{c,4} = sprintf('%0.2f', min([X1offsets, X2offsets]));
 
 % Compute maximum field edge offsets
 c = c + 1;
-table{c,1} = 'Max Field Edge Offset (mm)';
+table{c,1} = 'Max field edge offset (mm)';
 table{c,2} = sprintf('%0.2f', max(X1offsets));
 table{c,3} = sprintf('%0.2f', max(X2offsets));
 table{c,4} = sprintf('%0.2f', max([X1offsets, X2offsets]));
 
 % Compute average field edge offsets
 c = c + 1;
-table{c,1} = 'Avg Field Edge Offset (mm)';
+table{c,1} = 'Avg field edge offset (mm)';
 table{c,2} = sprintf('%0.2f', mean(X1offsets));
 table{c,3} = sprintf('%0.2f', mean(X2offsets));
 table{c,4} = sprintf('%0.2f', mean([X1offsets, X2offsets]));
@@ -89,6 +89,90 @@ table{c,2} = sprintf('%0.1f%%', sum(X1offsets(:) < 1) / length(X1offsets) * 100)
 table{c,3} = sprintf('%0.1f%%', sum(X2offsets(:) < 1) / length(X2offsets) * 100);
 table{c,4} = sprintf('%0.1f%%', (sum(X1offsets(:) < 1) + sum(X2offsets(:) < 1)) ...
     / (length(X1offsets) + length(X2offsets)) * 100);
+
+% Compute minimum field width differences
+c = c + 1;
+table{c,1} = 'Min field width difference (mm)';
+table{c,2} = '';
+table{c,3} = '';
+table{c,4} = sprintf('%0.2f', min(FWHMdiffs));
+
+% Compute maximum field width differences
+c = c + 1;
+table{c,1} = 'Max field width difference (mm)';
+table{c,2} = '';
+table{c,3} = '';
+table{c,4} = sprintf('%0.2f', max(FWHMdiffs));
+
+% Compute average field width differences
+c = c + 1;
+table{c,1} = 'Avg field width difference (mm)';
+table{c,2} = '';
+table{c,3} = '';
+table{c,4} = sprintf('%0.2f', mean(FWHMdiffs));
+
+% Display gamma criteria
+c = c + 1;
+table{c,1} = 'Gamma criteria (>80%)';
+table{c,2} = '';
+table{c,3} = '';
+table{c,4} = sprintf('%0.1f%%/%0.1f mm', [handles.abs, handles.dta]);
+
+% Compute max gamma
+c = c + 1;
+table{c,1} = 'Angle 1 max gamma';
+table{c,2} = '';
+table{c,3} = '';
+if isfield(handles, [head, 'gamma1'])
+    m = 0;
+    for i = 2:length(handles.([head, 'gamma1']))
+        m = max(m, max(handles.([head, 'gamma1']){i}));
+    end
+    table{c,4} = sprintf('%0.2f', m);
+    clear m;
+end
+
+% Compute max gamma
+c = c + 1;
+table{c,1} = 'Angle 2 max gamma';
+table{c,2} = '';
+table{c,3} = '';
+if isfield(handles, [head, 'gamma2'])
+    m = 0;
+    for i = 2:length(handles.([head, 'gamma2']))
+        m = max(m, max(handles.([head, 'gamma2']){i}));
+    end
+    table{c,4} = sprintf('%0.2f', m);
+    clear m;
+end
+
+% Compute max gamma
+c = c + 1;
+table{c,1} = 'Angle 3 max gamma';
+table{c,2} = '';
+table{c,3} = '';
+if isfield(handles, [head, 'gamma3'])
+    m = 0;
+    for i = 2:length(handles.([head, 'gamma3']))
+        m = max(m, max(handles.([head, 'gamma3']){i}));
+    end
+    table{c,4} = sprintf('%0.2f', m);
+    clear m;
+end
+
+% Compute max gamma
+c = c + 1;
+table{c,1} = 'Angle 4 max gamma';
+table{c,2} = '';
+table{c,3} = '';
+if isfield(handles, [head, 'gamma4'])
+    m = 0;
+    for i = 2:length(handles.([head, 'gamma4']))
+        m = max(m, max(handles.([head, 'gamma4']){i}));
+    end
+    table{c,4} = sprintf('%0.2f', m);
+    clear m;
+end
 
 % Set table data
 set(handles.([head, 'table']), 'Data', table);

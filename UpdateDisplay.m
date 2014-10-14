@@ -26,6 +26,7 @@ function varargout = UpdateDisplay(varargin)
 
 % Specify plot options and order
 plotoptions = {
+    ''
     'Field Edge Offsets'
     'Field Width Differences'
     'Angle 1 Profiles'
@@ -68,7 +69,7 @@ c = 0;
 % Execute code block based on display GUI item value
 switch get(handles.([head, 'display']),'Value')
     % If the user selected Field Edge Offsets
-    case 1
+    case 2
         % Initialize empty cell array for legend entries
         names = cell(0);
         
@@ -128,7 +129,7 @@ switch get(handles.([head, 'display']),'Value')
         grid on;
         
     % If the user selected FWHM differences
-    case 2
+    case 3
         % Initialize empty cell array for legend entries
         names = cell(0);
         
@@ -172,7 +173,7 @@ switch get(handles.([head, 'display']),'Value')
         grid on;
     
     % If the user chooses to view the dataset 1 profiles 
-    case 3
+    case 4
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file1']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file1']), 'String'))
@@ -191,7 +192,15 @@ switch get(handles.([head, 'display']),'Value')
                 plot(handles.([head, 'profiles1']){1}, ...
                     handles.([head, 'profiles1']){i+1} / ...
                     max(handles.([head, 'profiles1']){i+1}), 'red');
+                
+                % Plot gamma
+                plot(handles.([head, 'gamma1']){1}, ...
+                    handles.([head, 'gamma1']){i+1}, ...
+                    'Color', [0 0.75 0.75]);
             end
+            
+            % Add legend
+            legend('Reference', 'Measured', 'Gamma', 'location', 'SouthEast');
             
             % Finish specifying plot
             hold off; 
@@ -207,7 +216,7 @@ switch get(handles.([head, 'display']),'Value')
         end
         
     % If the user chooses to view the dataset 2 profiles 
-    case 4
+    case 5
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file2']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file2']), 'String'))
@@ -226,7 +235,15 @@ switch get(handles.([head, 'display']),'Value')
                 plot(handles.([head, 'profiles2']){1}, ...
                     handles.([head, 'profiles2']){i+1} / ...
                     max(handles.([head, 'profiles2']){i+1}), 'red');
+                
+                % Plot gamma
+                plot(handles.([head, 'gamma2']){1}, ...
+                    handles.([head, 'gamma2']){i+1}, ...
+                    'Color', [0 0.75 0.75]);
             end
+            
+            % Add legend
+            legend('Reference', 'Measured', 'Gamma', 'location', 'SouthEast');
             
             % Finish specifying plot
             hold off; 
@@ -242,7 +259,7 @@ switch get(handles.([head, 'display']),'Value')
         end
         
     % If the user chooses to view the dataset 3 profiles 
-    case 5
+    case 6
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file3']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file3']), 'String'))
@@ -261,7 +278,15 @@ switch get(handles.([head, 'display']),'Value')
                 plot(handles.([head, 'profiles3']){1}, ...
                     handles.([head, 'profiles3']){i+1} / ...
                     max(handles.([head, 'profiles3']){i+1}), 'red');
+                
+                % Plot gamma
+                plot(handles.([head, 'gamma3']){1}, ...
+                    handles.([head, 'gamma3']){i+1}, ...
+                    'Color', [0 0.75 0.75]);
             end
+            
+            % Add legend
+            legend('Reference', 'Measured', 'Gamma', 'location', 'SouthEast');
             
             % Finish specifying plot
             hold off; 
@@ -277,7 +302,7 @@ switch get(handles.([head, 'display']),'Value')
         end
         
     % If the user chooses to view the dataset 4 profiles     
-    case 6
+    case 7
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file4']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file4']), 'String'))
@@ -296,7 +321,15 @@ switch get(handles.([head, 'display']),'Value')
                 plot(handles.([head, 'profiles4']){1}, ...
                     handles.([head, 'profiles4']){i+1} / ...
                     max(handles.([head, 'profiles4']){i+1}), 'red');
+                
+                % Plot gamma
+                plot(handles.([head, 'gamma4']){1}, ...
+                    handles.([head, 'gamma4']){i+1}, ...
+                    'Color', [0 0.75 0.75]);
             end
+            
+            % Add legend
+            legend('Reference', 'Measured', 'Gamma', 'location', 'SouthEast');
             
             % Finish specifying plot
             hold off; 

@@ -4,7 +4,7 @@ ViewRay MLC Position Check
 by Mark Geurts <mark.w.geurts@gmail.com>
 <br>Copyright &copy; 2014, University of Wisconsin Board of Regents
 
-AnalyzeMLCProfiles.m loads Monte Carlo treatment planning data from the ViewRay Treatment Planning System and compares it to measured Sun Nuclear IC Profiler data to evaluate the positioning accuracy of each MLC bank.  To successfully process the data, six exposures must be acquired for a given head and gantry angle at the following MLC positions (in cm):
+AnalyzeMLCProfiles.m loads Monte Carlo treatment planning data from the ViewRay&trade; Treatment Planning System and compares it to measured Sun Nuclear IC Profiler&trade; data to evaluate the positioning accuracy of each MLC bank.  To successfully process the data, six exposures must be acquired for a given head and gantry angle at the following MLC positions (in cm):
 
 | Strip   |	X1 (cm) |	 X2 (cm) |  Y1 (cm) |	 Y2 (cm) |
 ----------|---------|----------|----------|----------|

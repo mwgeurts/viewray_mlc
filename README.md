@@ -4,7 +4,7 @@ ViewRay MLC Position Check
 by Mark Geurts <mark.w.geurts@gmail.com>
 <br>Copyright &copy; 2014, University of Wisconsin Board of Regents
 
-AnalyzeMLCProfiles.m loads Monte Carlo treatment planning data from the ViewRay&trade; Treatment Planning System and compares it to measured Sun Nuclear IC Profiler&trade; data to evaluate the positioning accuracy of each MLC bank.  To successfully process the data, six exposures must be acquired for a given head and gantry angle at the following MLC positions (in cm):
+The ViewRay MLC Position Check loads Monte Carlo treatment planning data from the ViewRay&trade; Treatment Planning System and compares it to measured Sun Nuclear IC Profiler&trade; data to evaluate the positioning accuracy of each MLC bank.  To successfully process the data, six exposures must be acquired for a given head and gantry angle at the following MLC positions (in cm):
 
 | Strip   |	X1 (cm) |	 X2 (cm) |  Y1 (cm) |	 Y2 (cm) |
 ----------|---------|----------|----------|----------|
@@ -30,7 +30,9 @@ When measuring data with IC Profiler, it is assumed that the profiler will be po
 
 ## Installation and Use
 
-To run this application, copy all MATLAB .m and .fig and the `Reference` folder contents into a directory with read/write access and then execute AnalyzeMLCProfiles.m.  Global configuration variables such as the default brose path can be modified by changing the values in `AnalyzeMLCProfiles_OpeningFcn` prior to execution.  A log file will automatically be created in the same directory and can be used for troubleshooting.  For instructions on acquiring the input data, see [Measurement Instructions](README.md#measurement-instructions). For information about software version and configuration pre-requisities, see [Compatibility and Requirements](README.md#compatibility-and-requirements).
+To install this application, copy all MATLAB .m and .fig and the Reference folder contents into a directory with read/write access and then copy the [CalcGamma.m submodule from the gamma repository](https://github.com/mwgeurts/gamma) into the gamma subfolder.  If using git, execute `git clone --recursive https://github.com/mwgeurts/viewray_mlc`.
+
+To run this application, navigate to the installation path and execute `AnalyzeMLCProfiles` in MATLAB. Global configuration variables such as the default brose path can be modified by changing the values in `AnalyzeMLCProfiles_OpeningFcn` prior to execution.  A log file will automatically be created in the same directory and can be used for troubleshooting.  For instructions on acquiring the input data, see [Measurement Instructions](README.md#measurement-instructions). For information about software version and configuration pre-requisities, see [Compatibility and Requirements](README.md#compatibility-and-requirements).
 
 ## Measurement Instructions
 

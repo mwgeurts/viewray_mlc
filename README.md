@@ -20,19 +20,23 @@ When measuring data with IC Profiler, it is assumed that the profiler will be po
 ## Contents
 
 * [Installation and Use](README.md#installation-and-use)
+* [Compatibility and Requirements](README.md#compatibility-and-requirements)
 * [Measurement Instructions](README.md#measurement-instructions)
   * [Set up the IC Profiler](README.md#set-up-the-ic-profiler)  
   * [Orient the IC Profiler in the Sagittal Position](README.md#orient-the-ic-profiler-in-the-sagittal-position)
   * [Collect MLC Data](README.md#Collect-mlc-data)
   * [Analyze MLC Data](README.md#Analyze-mlc-data)
 * [Gamma Computation Methods](README.md#Gamma-computation-methods)
-* [Compatibility and Requirements](README.md#compatibility-and-requirements)
 
 ## Installation and Use
 
 To install this application, copy all MATLAB .m and .fig and the Reference folder contents into a directory with read/write access and then copy the [CalcGamma.m submodule from the gamma repository](https://github.com/mwgeurts/gamma) into the gamma subfolder.  If using git, execute `git clone --recursive https://github.com/mwgeurts/viewray_mlc`.
 
 To run this application, navigate to the installation path and execute `AnalyzeMLCProfiles` in MATLAB. Global configuration variables such as the default brose path can be modified by changing the values in `AnalyzeMLCProfiles_OpeningFcn` prior to execution.  A log file will automatically be created in the same directory and can be used for troubleshooting.  For instructions on acquiring the input data, see [Measurement Instructions](README.md#measurement-instructions). For information about software version and configuration pre-requisities, see [Compatibility and Requirements](README.md#compatibility-and-requirements).
+
+## Compatibility and Requirements
+
+This tool has been tested with ViewRay version 3.5 treatment software and Sun Nuclear IC Profiler software version 3.3.1.31111 on MATLAB 8.3 and 8.4.  The Parallel Computing toolbox (version 6.4 and 6.5 tested) and a CUDA-compatible GPU are required to run GPU based interpolation (CPU interpolation is automatically supported if not present).
 
 ## Measurement Instructions
 
@@ -158,7 +162,3 @@ The absolute criterion is typically given in percent and can refer to a percent 
 
 The computation applied in the tool is the 1D algorithm, in that the distance to agreement criterion is evaluated only along the dimension of the reference profile when determining *min{&Gamma;(Rm,Rc}&forall;{Rc}*. To accomplish this, the reference profile is shifted relative to the measured profile using linear 1D CUDA (when available) interpolation.  For each shift, *&Gamma;(Rm,Rc}* is computed, and the minimum value *&gamma;* is determined.  To improve computation efficiency, the computation space *&forall;{Rc}* is limited to twice the distance to agreement parameter.  Thus, the maximum "real" Gamma index returned by the application is 2.
 
-
-## Compatibility and Requirements
-
-This tool has been tested with ViewRay version 3.5 treatment software and Sun Nuclear IC Profiler software version 3.3.1.31111 on MATLAB 8.3 and 8.4.  The Parallel Computing toolbox (version 6.4 and 6.5 tested) and a CUDA-compatible GPU are required to run GPU based interpolation (CPU interpolation is automatically supported if not present).

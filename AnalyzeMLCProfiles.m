@@ -100,6 +100,7 @@ string = sprintf('%s\n', separator, string{:}, separator);
 % Log information
 Event(string, 'INIT');
 
+%% Initialize GUI
 % Turn off images
 set(allchild(handles.h1axes), 'visible', 'off'); 
 set(handles.h1axes, 'visible', 'off'); 
@@ -119,7 +120,7 @@ set(handles.h1table, 'Data', cell(8,4));
 set(handles.h2table, 'Data', cell(8,4));
 set(handles.h3table, 'Data', cell(8,4));
 
-% Initialize global variables
+%% Initialize global variables
 handles.path = userpath;
 Event(['Default file path set to ', handles.path]);
 
@@ -128,19 +129,62 @@ handles.dta = 1.0; % mm
 Event(sprintf('Gamma criteria set to %0.1f%%/%0.1f mm', ...
     [handles.abs handles.dta]));
 
-% Add gamma submodule to search path
-addpath('./gamma');
+%% Load submodules
+% Add snc_extract submodule to search path
+addpath('./snc_extract');
 
-% Check if MATLAB can find CalcGamma.m
-if exist('CalcGamma', 'file') ~= 2
+% Check if MATLAB can find ParseSNCacm.m
+if exist('ParseSNCacm', 'file') ~= 2
+    
     % If not, throw an error
-    Event(['The CalcGamma submodule does not exist in the search path. Use ', ...
-        'git clone --recursive or git submodule init followed by git ', ...
+    Event(['The snc_extract submodule does not exist in the search path. ', ...
+        'Use git clone --recursive or git submodule init followed by git ', ...
         'submodule update to fetch all submodules'], 'ERROR');
 end
 
-% Load reference profiles
-handles = LoadReferenceProfiles(handles);
+%% Load reference profiles
+% Declare the AP (through the front of the IC Profiler) Monte Carlo planar
+% data files exported from the TPS
+handles.APfiles = {
+    './reference/AP-10_PlaneDose_Vertical_Point1.dcm'
+    './reference/AP-6_PlaneDose_Vertical_Point2.dcm'
+    './reference/AP-2_PlaneDose_Vertical_Point3.dcm'
+    './reference/AP+2_PlaneDose_Vertical_Point4.dcm'
+    './reference/AP+6_PlaneDose_Vertical_Point5.dcm'
+    './reference/AP+10_PlaneDose_Vertical_Point6.dcm'
+};
+
+% Load and extract reference profiles, rotated by 90 deg
+handles.APreferences = LoadProfilerDICOMReference(90, handles.APfiles);
+
+% Declare the PA (through the back of the IC Profiler and jig but without
+% the couch) Monte Carlo planar data files exported from the TPS
+handles.PANCfiles = {
+    './reference/PA-10_NOCOUCH_PlaneDose_Vertical_Point1.dcm'
+    './reference/PA-6_NOCOUCH_PlaneDose_Vertical_Point2.dcm'
+    './reference/PA-2_NOCOUCH_PlaneDose_Vertical_Point3.dcm'
+    './reference/PA+2_NOCOUCH_PlaneDose_Vertical_Point4.dcm'
+    './reference/PA+6_NOCOUCH_PlaneDose_Vertical_Point5.dcm'
+    './reference/PA+10_NOCOUCH_PlaneDose_Vertical_Point6.dcm'
+};
+
+% Load and extract reference profiles, rotated by 90 deg
+handles.PANCreferences = LoadProfilerDICOMReference(90, handles.PANCfiles);
+
+
+% Declare the PA (through the back of the IC Profiler, jig, and couch) 
+% Monte Carlo planar data files exported from the TPS
+handles.PATCfiles = {
+    './reference/PA-10_THRUCOUCH_PlaneDose_Vertical_Point1.dcm'
+    './reference/PA-6_THRUCOUCH_PlaneDose_Vertical_Point2.dcm'
+    './reference/PA-2_THRUCOUCH_PlaneDose_Vertical_Point3.dcm'
+    './reference/PA+2_THRUCOUCH_PlaneDose_Vertical_Point4.dcm'
+    './reference/PA+6_THRUCOUCH_PlaneDose_Vertical_Point5.dcm'
+    './reference/PA+10_THRUCOUCH_PlaneDose_Vertical_Point6.dcm'
+};
+
+% Load and extract reference profiles, rotated by 90 deg
+handles.PATCreferences = LoadProfilerDICOMReference(90, handles.PATCfiles);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -167,8 +211,7 @@ function h1file1_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -180,19 +223,8 @@ function h1browse1_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H1 angle 1 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h1', '1');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h1');
-
-% Log event
-Event(sprintf('H1 angle 1 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h1', '1');
     
 % Update handles structure
 guidata(hObject, handles);
@@ -209,8 +241,7 @@ function h1angle1_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -228,8 +259,7 @@ function h1file2_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -241,19 +271,8 @@ function h1browse2_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H1 angle 2 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h1', '2');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h1');
-
-% Log event
-Event(sprintf('H1 angle 2 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h1', '2');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -270,8 +289,7 @@ function h1angle2_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -289,8 +307,7 @@ function h1file3_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -302,19 +319,8 @@ function h1browse3_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H1 angle 3 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h1', '3');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h1');
-
-% Log event
-Event(sprintf('H1 angle 3 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h1', '3');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -331,8 +337,7 @@ function h1angle3_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -350,8 +355,7 @@ function h1file4_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -363,19 +367,8 @@ function h1browse4_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H1 angle 4 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h1', '4');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h1');
-
-% Log event
-Event(sprintf('H1 angle 4 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h1', '4');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -392,8 +385,7 @@ function h1angle4_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -420,8 +412,7 @@ function h1display_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -433,25 +424,8 @@ function h1clear_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H1 clear all button selected');
-
-% Loop through each dataset
-for i = 1:4
-    set(handles.(sprintf('h1angle%i', i)), 'Value', 1);
-    set(handles.(sprintf('h1file%i', i)), 'String', '');
-    handles.(sprintf('h1profiles%i', i)) = cell();
-    handles.(sprintf('h1gamma%i', i)) = cell();
-end
-
-% Call UpdateDisplay to clear plot
-handles = UpdateDisplay(handles, 'h1');
-
-% Set table data
-set(handles.h1table, 'Data', cell(8,4));
-
-% Log event
-Event('H1 data cleared from memory');
+% Execute ClearCallback
+handles = ClearCallback(handles, 'h1');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -468,8 +442,7 @@ function h3file1_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -481,19 +454,8 @@ function h3browse1_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H3 angle 1 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h3', '1');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h3');
-
-% Log event
-Event(sprintf('H3 angle 1 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h3', '1');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -510,8 +472,7 @@ function h3angle1_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -523,19 +484,8 @@ function h3browse2_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H3 angle 2 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h3', '2');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h3');
-
-% Log event
-Event(sprintf('H3 angle 2 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h3', '2');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -552,8 +502,7 @@ function h3angle2_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -565,19 +514,8 @@ function h3browse3_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H3 angle 3 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h3', '3');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h3');
-
-% Log event
-Event(sprintf('H3 angle 3 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h3', '3');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -594,8 +532,7 @@ function h3angle3_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -613,8 +550,7 @@ function h3file4_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -626,19 +562,8 @@ function h3browse4_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H3 angle 4 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h3', '4');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h3');
-
-% Log event
-Event(sprintf('H3 angle 4 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h3', '4');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -655,8 +580,7 @@ function h3angle4_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -683,8 +607,7 @@ function h3display_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -696,25 +619,8 @@ function h3clear_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H3 clear all button selected');
-
-% Loop through each dataset
-for i = 1:4
-    set(handles.(sprintf('h3angle%i', i)), 'Value', 1);
-    set(handles.(sprintf('h3file%i', i)), 'String', '');
-    handles.(sprintf('h3profiles%i', i)) = cell();
-    handles.(sprintf('h3gamma%i', i)) = cell();
-end
-
-% Call UpdateDisplay to clear plot
-handles = UpdateDisplay(handles, 'h3');
-
-% Set table data
-set(handles.h3table, 'Data', cell(8,4));
-
-% Log event
-Event('H3 data cleared from memory');
+% Execute ClearCallback
+handles = ClearCallback(handles, 'h3');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -731,8 +637,7 @@ function h3file3_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -750,8 +655,7 @@ function h3file2_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -769,9 +673,9 @@ function h2file1_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+% Edit controls usually have a white background on Windows.
+if ispc && isequal(get(hObject,'BackgroundColor'), ...
+        get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
@@ -781,19 +685,8 @@ function h2browse1_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H2 angle 1 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h2', '1');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h2');
-
-% Log event
-Event(sprintf('H2 angle 1 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h2', '1');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -810,8 +703,7 @@ function h2angle1_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -823,19 +715,8 @@ function h2browse2_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H2 angle 2 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h2', '2');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h2');
-
-% Log event
-Event(sprintf('H2 angle 2 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h2', '2');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -852,8 +733,7 @@ function h2angle2_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -865,19 +745,8 @@ function h2browse3_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H2 angle 3 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h2', '3');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h2');
-
-% Log event
-Event(sprintf('H2 angle 3 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h2', '3');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -894,8 +763,7 @@ function h2angle3_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -913,8 +781,7 @@ function h2file4_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -926,19 +793,8 @@ function h2browse4_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H2 angle 4 browse button selected');
-t = tic;
-
-% Load profile data
-handles = LoadSNCProfiles(handles, 'h2', '4');
-
-% Update plot
-handles = UpdateDisplay(handles, 'h2');
-
-% Log event
-Event(sprintf('H2 angle 4 data loaded successfully in %0.3f seconds', toc(t)));
-clear t;
+% Execute BrowseCallback to load new data
+handles = BrowseCallback(handles, 'h2', '4');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -955,8 +811,7 @@ function h2angle4_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -983,8 +838,7 @@ function h2display_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Popupmenu controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -996,25 +850,8 @@ function h2clear_Callback(hObject, ~, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Log event
-Event('H2 clear all button selected');
-
-% Loop through each dataset
-for i = 1:4
-    set(handles.(sprintf('h2angle%i', i)), 'Value', 1);
-    set(handles.(sprintf('h2file%i', i)), 'String', '');
-    handles.(sprintf('h2profiles%i', i)) = cell();
-    handles.(sprintf('h2gamma%i', i)) = cell();
-end
-
-% Call UpdateDisplay to clear plot
-handles = UpdateDisplay(handles, 'h2');
-
-% Set table data
-set(handles.h2table, 'Data', cell(8,4));
-
-% Log event
-Event('H2 data cleared from memory');
+% Execute ClearCallback
+handles = ClearCallback(handles, 'h2');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -1031,8 +868,7 @@ function h2file3_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -1050,8 +886,7 @@ function h2file2_CreateFcn(hObject, ~, ~)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+% Edit controls usually have a white background on Windows.
 if ispc && isequal(get(hObject,'BackgroundColor'), ...
         get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');

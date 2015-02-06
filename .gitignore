@@ -1,4 +1,6 @@
-*.DS_STORE
+GPU/
+ganymed-ssh2*
+.DS_STORE
 *.m~
-*.txt
-*.xlsx
+log.txt
+test_data/

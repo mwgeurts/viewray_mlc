@@ -2,10 +2,9 @@ function handles = UpdateMLCStatistics(handles, head)
 % UpdateMLCStatistics is called by AnalyzeMLCProfiles to compute and update
 % the statistics table for each head.  See below for more information on
 % the statistics computed.  This function uses GUI handles data (passed in
-% the first input variable) loaded by LoadReferenceProfiles and
-% ParseSNCProfiles.  This function also uses the input variable head, which
-% should be a string indicating the head number (h1, h2, or h3) to
-% determine which UI table to modify.  Upon successful completion, an
+% the first input variable).  This function also uses the input variable 
+% head, which should be a string indicating the head number (h1, h2, or h3) 
+% to determine which UI table to modify.  Upon successful completion, an
 % updated GUI handles structure is returned.
 %
 % Author: Mark Geurts, mark.w.geurts@gmail.com
@@ -45,19 +44,24 @@ c = 0;
 
 % Loop through each dataset
 for i = 1:4
+    
+    % If file data exists
     if ~strcmp(get(handles.(sprintf('%sfile%i', head, i)), 'String'), '') ...
             && ~isempty(get(handles.(sprintf('%sfile%i', head, i)), 'String'))
         
         % Add this dataset's X1 offsets to array
-        X1offsets(c*4+1:c*4+6) = handles.(sprintf('%sX1%i', head, i)) - ...
+        X1offsets(c*4+1:c*4+length(handles.(sprintf('%sX1%i', head, i)))) ...
+            = handles.(sprintf('%sX1%i', head, i)) - ...
             handles.(sprintf('%srefX1%i', head, i));
         
         % Add this dataset's X2 offsets to array
-        X2offsets(c*4+1:c*4+6) = handles.(sprintf('%sX2%i', head, i)) - ...
+        X2offsets(c*4+1:c*4+length(handles.(sprintf('%sX1%i', head, i)))) ...
+            = handles.(sprintf('%sX2%i', head, i)) - ...
             handles.(sprintf('%srefX2%i', head, i));
         
         % Add this dataset's FWHM differences to array
-        FWHMdiffs(c*4+1:c*4+6) = handles.(sprintf('%sFWHM%i', head, i)) - ...
+        FWHMdiffs(c*4+1:c*4+length(handles.(sprintf('%sX1%i', head, i)))) ...
+            = handles.(sprintf('%sFWHM%i', head, i)) - ...
             handles.(sprintf('%srefFWHM%i', head, i));
         
         % Increment counter
@@ -72,73 +76,73 @@ c = 0;
 % Compute minimum field edge offsets
 c = c + 1;
 table{c,1} = 'Min field edge offset (mm)';
-table{c,2} = sprintf('%0.2f', min(X1offsets));
-table{c,3} = sprintf('%0.2f', min(X2offsets));
-table{c,4} = sprintf('%0.2f', min([X1offsets, X2offsets]));
+table{c,2} = sprintf('%0.2f', min(X1offsets)*10);
+table{c,3} = sprintf('%0.2f', min(X2offsets)*10);
+table{c,4} = sprintf('%0.2f', min([X1offsets, X2offsets])*10);
 Event(sprintf(['Minimum field edge offsets computed (X1 = %0.3f, X2 = ', ...
-    '%0.3f, both = %0.3f)'], min(X1offsets), min(X2offsets), ...
-    min([X1offsets, X2offsets])));
+    '%0.3f, both = %0.3f)'], min(X1offsets)*10, min(X2offsets)*10, ...
+    min([X1offsets, X2offsets])*10));
 
 % Compute maximum field edge offsets
 c = c + 1;
 table{c,1} = 'Max field edge offset (mm)';
-table{c,2} = sprintf('%0.2f', max(X1offsets));
-table{c,3} = sprintf('%0.2f', max(X2offsets));
-table{c,4} = sprintf('%0.2f', max([X1offsets, X2offsets]));
+table{c,2} = sprintf('%0.2f', max(X1offsets)*10);
+table{c,3} = sprintf('%0.2f', max(X2offsets)*10);
+table{c,4} = sprintf('%0.2f', max([X1offsets, X2offsets])*10);
 Event(sprintf(['Maximum field edge offsets computed (X1 = %0.3f, X2 = ', ...
-    '%0.3f, both = %0.3f)'], max(X1offsets), max(X2offsets), ...
-    max([X1offsets, X2offsets])));
+    '%0.3f, both = %0.3f)'], max(X1offsets)*10, max(X2offsets)*10, ...
+    max([X1offsets, X2offsets])*10));
 
 % Compute average field edge offsets
 c = c + 1;
 table{c,1} = 'Avg field edge offset (mm)';
-table{c,2} = sprintf('%0.2f', mean(X1offsets));
-table{c,3} = sprintf('%0.2f', mean(X2offsets));
-table{c,4} = sprintf('%0.2f', mean([X1offsets, X2offsets]));
+table{c,2} = sprintf('%0.2f', mean(X1offsets)*10);
+table{c,3} = sprintf('%0.2f', mean(X2offsets)*10);
+table{c,4} = sprintf('%0.2f', mean([X1offsets, X2offsets])*10);
 Event(sprintf(['Average field edge offsets computed (X1 = %0.3f, X2 = ', ...
-    '%0.3f, both = %0.3f)'], mean(X1offsets), mean(X2offsets), ...
-    mean([X1offsets, X2offsets])));
+    '%0.3f, both = %0.3f)'], mean(X1offsets)*10, mean(X2offsets)*10, ...
+    mean([X1offsets, X2offsets])*10));
 
 % Compute % less than 1 mm
 c = c + 1;
 table{c,1} = 'Offets less than 1 mm';
-table{c,2} = sprintf('%0.1f%%', sum(X1offsets(:) < 1) / length(X1offsets) * 100);
-table{c,3} = sprintf('%0.1f%%', sum(X2offsets(:) < 1) / length(X2offsets) * 100);
-table{c,4} = sprintf('%0.1f%%', (sum(X1offsets(:) < 1) + sum(X2offsets(:) < 1)) ...
+table{c,2} = sprintf('%0.1f%%', sum(X1offsets(:) < 0.1) / length(X1offsets) * 100);
+table{c,3} = sprintf('%0.1f%%', sum(X2offsets(:) < 0.1) / length(X2offsets) * 100);
+table{c,4} = sprintf('%0.1f%%', (sum(X1offsets(:) < 0.1) + sum(X2offsets(:) < 0.1)) ...
     / (length(X1offsets) + length(X2offsets)) * 100);
 Event(sprintf('%i X1, %i X2 offsets less than 1 mm', ...
-    sum(X1offsets(:) < 1), sum(X2offsets(:) < 1)));
+    sum(X1offsets(:) < 0.1), sum(X2offsets(:) < 0.1)));
 
 % Compute minimum field width differences
 c = c + 1;
 table{c,1} = 'Min field width difference (mm)';
 table{c,2} = '';
 table{c,3} = '';
-table{c,4} = sprintf('%0.2f', min(FWHMdiffs));
-Event(sprintf('Minimum FWHM difference computed as %0.3f', min(FWHMdiffs)));
+table{c,4} = sprintf('%0.2f', min(FWHMdiffs)*10);
+Event(sprintf('Minimum FWHM difference computed as %0.3f', min(FWHMdiffs)*10));
 
 % Compute maximum field width differences
 c = c + 1;
 table{c,1} = 'Max field width difference (mm)';
 table{c,2} = '';
 table{c,3} = '';
-table{c,4} = sprintf('%0.2f', max(FWHMdiffs));
-Event(sprintf('Maximum FWHM difference computed as %0.3f', max(FWHMdiffs)));
+table{c,4} = sprintf('%0.2f', max(FWHMdiffs)*10);
+Event(sprintf('Maximum FWHM difference computed as %0.3f', max(FWHMdiffs)*10));
 
 % Compute average field width differences
 c = c + 1;
 table{c,1} = 'Avg field width difference (mm)';
 table{c,2} = '';
 table{c,3} = '';
-table{c,4} = sprintf('%0.2f', mean(FWHMdiffs));
-Event(sprintf('Mean FWHM difference computed as %0.3f', mean(FWHMdiffs)));
+table{c,4} = sprintf('%0.2f', mean(FWHMdiffs)*10);
+Event(sprintf('Mean FWHM difference computed as %0.3f', mean(FWHMdiffs)*10));
 
 % Display gamma criteria
 c = c + 1;
-table{c,1} = 'Gamma criteria (>80%)';
+table{c,1} = sprintf('Gamma criteria (>%0.0f%%)', handles.thresh*100);
 table{c,2} = '';
 table{c,3} = '';
-table{c,4} = sprintf('%0.1f%%/%0.1f mm', handles.abs, handles.dta);
+table{c,4} = sprintf('%0.1f%%/%0.1f mm', handles.abs, handles.dta*10);
 
 % Compute max gamma
 c = c + 1;
@@ -147,12 +151,12 @@ table{c,2} = '';
 table{c,3} = '';
 if isfield(handles, [head, 'gamma1'])
     m = 0;
-    for i = 2:length(handles.([head, 'gamma1']))
-        m = max(m, max(handles.([head, 'gamma1']){i}));
+    for i = 2:size(handles.([head, 'gamma1']),1)
+        m = max(m, max(handles.([head, 'gamma1'])(i,:)));
     end
     table{c,4} = sprintf('%0.2f', m);
     Event(sprintf('Maximum %0.2f%%/%0.2f mm gamma from angle 1 = %0.3f', ...
-        handles.abs, handles.dta, m));
+        handles.abs, handles.dta*10, m));
     clear m;
 end
 
@@ -163,12 +167,12 @@ table{c,2} = '';
 table{c,3} = '';
 if isfield(handles, [head, 'gamma2'])
     m = 0;
-    for i = 2:length(handles.([head, 'gamma2']))
-        m = max(m, max(handles.([head, 'gamma2']){i}));
+    for i = 2:size(handles.([head, 'gamma2']),1)
+        m = max(m, max(handles.([head, 'gamma2'])(i,:)));
     end
     table{c,4} = sprintf('%0.2f', m);
     Event(sprintf('Maximum %0.2f%%/%0.2f mm gamma from angle 2 = %0.3f', ...
-        handles.abs, handles.dta, m));
+        handles.abs, handles.dta*10, m));
     clear m;
 end
 
@@ -179,12 +183,12 @@ table{c,2} = '';
 table{c,3} = '';
 if isfield(handles, [head, 'gamma3'])
     m = 0;
-    for i = 2:length(handles.([head, 'gamma3']))
-        m = max(m, max(handles.([head, 'gamma3']){i}));
+    for i = 2:size(handles.([head, 'gamma3']),1)
+        m = max(m, max(handles.([head, 'gamma3'])(i,:)));
     end
     table{c,4} = sprintf('%0.2f', m);
     Event(sprintf('Maximum %0.2f%%/%0.2f mm gamma from angle 3 = %0.3f', ...
-        handles.abs, handles.dta, m));
+        handles.abs, handles.dta*10, m));
     clear m;
 end
 
@@ -195,12 +199,12 @@ table{c,2} = '';
 table{c,3} = '';
 if isfield(handles, [head, 'gamma4'])
     m = 0;
-    for i = 2:length(handles.([head, 'gamma4']))
-        m = max(m, max(handles.([head, 'gamma4']){i}));
+    for i = 2:size(handles.([head, 'gamma4']),1)
+        m = max(m, max(handles.([head, 'gamma4'])(i,:)));
     end
     table{c,4} = sprintf('%0.2f', m);
     Event(sprintf('Maximum %0.2f%%/%0.2f mm gamma from angle 4 = %0.3f', ...
-        handles.abs, handles.dta, m));
+        handles.abs, handles.dta*10, m));
     clear m;
 end
 

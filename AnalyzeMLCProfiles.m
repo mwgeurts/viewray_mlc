@@ -125,9 +125,12 @@ handles.path = userpath;
 Event(['Default file path set to ', handles.path]);
 
 handles.abs = 2.0; % percent
-handles.dta = 1.0; % mm
+handles.dta = 0.1; % cm
 Event(sprintf('Gamma criteria set to %0.1f%%/%0.1f mm', ...
-    [handles.abs handles.dta]));
+    [handles.abs handles.dta*10]));
+
+handles.thresh = 0.8;
+Event(sprintf('Gamma threshold set to %0.1f%%', handles.thresh * 100));
 
 %% Load submodules
 % Add snc_extract submodule to search path
@@ -155,7 +158,7 @@ handles.APfiles = {
 };
 
 % Load and extract reference profiles, rotated by 90 deg
-handles.APreferences = LoadProfilerDICOMReference(90, handles.APfiles);
+handles.APreferences = LoadProfilerDICOMReference(handles.APfiles, 90);
 
 % Declare the PA (through the back of the IC Profiler and jig but without
 % the couch) Monte Carlo planar data files exported from the TPS
@@ -169,8 +172,7 @@ handles.PANCfiles = {
 };
 
 % Load and extract reference profiles, rotated by 90 deg
-handles.PANCreferences = LoadProfilerDICOMReference(90, handles.PANCfiles);
-
+handles.PANCreferences = LoadProfilerDICOMReference(handles.PANCfiles, 90);
 
 % Declare the PA (through the back of the IC Profiler, jig, and couch) 
 % Monte Carlo planar data files exported from the TPS
@@ -184,7 +186,7 @@ handles.PATCfiles = {
 };
 
 % Load and extract reference profiles, rotated by 90 deg
-handles.PATCreferences = LoadProfilerDICOMReference(90, handles.PATCfiles);
+handles.PATCreferences = LoadProfilerDICOMReference(handles.PATCfiles, 90);
 
 % Update handles structure
 guidata(hObject, handles);

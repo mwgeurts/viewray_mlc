@@ -45,14 +45,16 @@ if iscell(name) || sum(name ~= 0)
     if ~iscell(name)
     
         % Update text box with file name
-        set(handles.([head,'file']), 'String', fullfile(path, name));
+        set(handles.([head,'file',file]), 'String', fullfile(path, name));
         
         % Store filenames
+        handles.([head,'names',file]) = cell(1);
         handles.([head,'names',file]){1} = name;
     else
     
         % Update text box with first file
-        set(handles.([head,'file']), 'String', 'Multiple files selected');
+        set(handles.([head,'file',file]), 'String', ...
+            'Multiple files selected');
         
         % Store filenames
         handles.([head,'names',file]) = name;
@@ -146,26 +148,38 @@ if iscell(name) || sum(name ~= 0)
             refdata = handles.PANCreferences;
     end
     
+    % Apply gamma criteria
+    refdata.abs = handles.abs;
+    refdata.dta = handles.dta;
+    
     % Process profiles, comparing to reference data (normalized to max)
     [results, refresults] = AnalyzeProfilerFields(data, refdata, 'max');
     
     % Set application specific data
-    handles.([head,'profiles',file]) = [];
-    handles.([head,'FWHM',file]) = [];
-    handles.([head,'X1',file]) = [];
-    handles.([head,'X2',file]) = [];
-    handles.([head,'gamma',file]) = [];
-    handles.([head,'refprofiles',file]) = [];
-    handles.([head,'refFWHM',file]) = [];
-    handles.([head,'refX1',file]) = [];
-    handles.([head,'refX2',file]) = [];
+    handles.([head,'profiles',file]) = results.ydata;
+    handles.([head,'FWHM',file]) = results.yfwhm;
+    handles.([head,'X1',file]) = results.yedges(:,1);
+    handles.([head,'X2',file]) = results.yedges(:,2);
+    handles.([head,'gamma',file]) = results.ygamma;
+    handles.([head,'refprofiles',file]) = refresults.ydata;
+    handles.([head,'refFWHM',file]) = refresults.yfwhm;
+    handles.([head,'refX1',file]) = refresults.yedges(:,1);
+    handles.([head,'refX2',file]) = refresults.yedges(:,2);
     
-    % Null gamma values < 80% max signal (helps improve visualization)
+    % Loop through each gamma profile
+    for i = 2:size(handles.([head,'gamma',file]),1)
     
+        % Null gamma values < 80% max signal (helps improve visualization)
+        handles.([head,'gamma',file])(i,:) = ...
+            handles.([head,'gamma',file])(i,:) .* ...
+            floor(handles.([head,'profiles',file])(i,:) / ...
+            (max(handles.([head,'profiles',file])(i,:) * handles.thresh)));
+    end
+    Event(sprintf(['Gamma values below %0.1f%% target profile ', ...
+        'threshold ignored'], handles.thresh*100));
     
-    
-    
-    Event('Gamma values below 80% target profile threshold ignored');
+    % Update MLC statistics
+    handles = UpdateMLCStatistics(handles, head);
     
     % Update plot to show profiles
     set(handles.([head,'display']), 'Value', 2);
@@ -176,7 +190,7 @@ if iscell(name) || sum(name ~= 0)
         head, file, toc(t)));
     
     % Clear temporary variables
-    clear t data refdata results refresults;
+    clear i t data refdata results refresults;
 end
 
 % Clear temporary variables

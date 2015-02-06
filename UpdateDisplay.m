@@ -5,8 +5,7 @@ function varargout = UpdateDisplay(varargin)
 % choose from.  When called with two input arguments, the first being a GUI
 % handles structure and the second a string indicating the head number (h1,
 % h2, or h3), this function will look for measured and reference data
-% (loaded by ParseSNCProfiles and LoadReferenceProfiles, respectively) and
-% update the display based on the display menu UI component.
+% and update the display based on the display menu UI component.
 %
 % Author: Mark Geurts, mark.w.geurts@gmail.com
 % Copyright (C) 2015 University of Wisconsin Board of Regents
@@ -82,6 +81,7 @@ switch get(handles.([head, 'display']),'Value')
     
     % If the user selected Field Edge Offsets
     case 2
+        
         % Log selection
         Event('Field Edge Offset selected for display');
         
@@ -106,9 +106,9 @@ switch get(handles.([head, 'display']),'Value')
                 c = c + 1;
                 
                 % Plot the X1 field edge difference from reference
-                plot(handles.(sprintf('%srefX1%i', head, i)), ...
-                    handles.(sprintf('%sX1%i', head, i)) - ...
-                    handles.(sprintf('%srefX1%i', head, i)), '-o', ...
+                plot(handles.(sprintf('%srefX1%i', head, i))*10, ...
+                    (handles.(sprintf('%sX1%i', head, i)) - ...
+                    handles.(sprintf('%srefX1%i', head, i)))*10, '-o', ...
                     'Color', cmap(c,:));
 
                 % Add legend entry for X1
@@ -120,9 +120,9 @@ switch get(handles.([head, 'display']),'Value')
                 c = c + 1;
                 
                 % Plot the X2 field edge difference from reference
-                plot(handles.(sprintf('%srefX2%i', head, i)), ...
-                    handles.(sprintf('%sX2%i', head, i)) - ...
-                    handles.(sprintf('%srefX2%i', head, i)), '-o', ...
+                plot(handles.(sprintf('%srefX2%i', head, i))*10, ...
+                    (handles.(sprintf('%sX2%i', head, i)) - ...
+                    handles.(sprintf('%srefX2%i', head, i)))*10, '-o', ...
                     'Color', cmap(c,:));
 
                 % Add legend entry for X2
@@ -136,16 +136,18 @@ switch get(handles.([head, 'display']),'Value')
         % Finish specifying plot
         hold off;
         xlabel('Field Edge (mm)');
-        xlim([-125 125]);
+        xlim([-150 150]);
         ylabel('Field Edge Difference (mm)');
         ylim([-3 3]);
         if c > 0
             legend(names);
         end
         grid on;
+        box on;
         
     % If the user selected FWHM differences
     case 3
+        
         % Log selection
         Event('FWHM differences selected for display');
         
@@ -159,8 +161,9 @@ switch get(handles.([head, 'display']),'Value')
         for i = 1:4
             
             % If the dataset exists
-            if ~strcmp(get(handles.(sprintf('%sfile%i', head, i)), 'String'), '') ...
-                    && ~isempty(get(handles.(sprintf('%sfile%i', head, i)), 'String'))
+            if ~strcmp(get(handles.(sprintf('%sfile%i', head, i)), ...
+                    'String'), '') && ~isempty(get(handles.(sprintf(...
+                    '%sfile%i', head, i)), 'String'))
                 
                 % Display the axes
                 set(allchild(handles.([head, 'axes'])), 'visible', 'on'); 
@@ -170,8 +173,8 @@ switch get(handles.([head, 'display']),'Value')
                 c = c + 1;
                 
                 % Plot the FWHM difference from reference
-                plot(handles.(sprintf('%sFWHM%i', head, i)) - ...
-                    handles.(sprintf('%srefFWHM%i', head, i)), '-o', ...
+                plot((handles.(sprintf('%sFWHM%i', head, i)) - ...
+                    handles.(sprintf('%srefFWHM%i', head, i)))*10, '-o', ...
                     'Color', cmap(c,:));
 
                  % Add legend entry
@@ -191,9 +194,11 @@ switch get(handles.([head, 'display']),'Value')
             legend(names);
         end
         grid on;
+        box on;
     
     % If the user chooses to view the dataset 1 profiles 
     case 4
+        
         % Log selection
         Event('Angle 1 profiles selected for display');
         
@@ -205,21 +210,21 @@ switch get(handles.([head, 'display']),'Value')
             hold on;
             
             % Loop through each reference profile
-            for i = 1:length(handles.([head, 'refprofiles1']))
+            for i = 2:size(handles.([head, 'refprofiles1']), 1)
                 
                 % Plot normalized reference data
-                plot(handles.([head, 'refprofiles1']){i}.profile(1,:), ...
-                    handles.([head, 'refprofiles1']){i}.profile(2,:) / ...
-                    max(handles.([head, 'refprofiles1']){i}.profile(2,:)), 'blue');
+                plot(handles.([head, 'refprofiles1'])(1,:)*10, ...
+                    handles.([head, 'refprofiles1'])(i,:) / ...
+                    max(handles.([head, 'refprofiles1'])(i,:)), 'blue');
                 
                 % Plot normalized measured data
-                plot(handles.([head, 'profiles1']){1}, ...
-                    handles.([head, 'profiles1']){i+1} / ...
-                    max(handles.([head, 'profiles1']){i+1}), 'red');
+                plot(handles.([head, 'profiles1'])(1,:)*10, ...
+                    handles.([head, 'profiles1'])(i,:) / ...
+                    max(handles.([head, 'profiles1'])(i,:)), 'red');
                 
                 % Plot gamma
-                plot(handles.([head, 'gamma1']){1}, ...
-                    handles.([head, 'gamma1']){i+1}, ...
+                plot(handles.([head, 'gamma1'])(1,:)*10, ...
+                    handles.([head, 'gamma1'])(i,:), ...
                     'Color', [0 0.75 0.75]);
             end
             
@@ -233,6 +238,7 @@ switch get(handles.([head, 'display']),'Value')
             xlabel('MLC X Position (mm)');
             xlim([-150 150]);
             grid on;
+            box on;
             
             % Turn on display
             set(allchild(handles.([head, 'axes'])), 'visible', 'on'); 
@@ -241,6 +247,7 @@ switch get(handles.([head, 'display']),'Value')
         
     % If the user chooses to view the dataset 2 profiles 
     case 5
+        
         % Log selection
         Event('Angle 2 profiles selected for display');
         
@@ -252,21 +259,21 @@ switch get(handles.([head, 'display']),'Value')
             hold on;
             
             % Loop through each reference profile
-            for i = 1:length(handles.([head, 'refprofiles2']))
+            for i = 2:size(handles.([head, 'refprofiles2']), 1)
                 
                 % Plot normalized reference data
-                plot(handles.([head, 'refprofiles2']){i}.profile(1,:), ...
-                    handles.([head, 'refprofiles2']){i}.profile(2,:) / ...
-                    max(handles.([head, 'refprofiles2']){i}.profile(2,:)), 'blue');
+                plot(handles.([head, 'refprofiles2'])(1,:)*10, ...
+                    handles.([head, 'refprofiles2'])(i,:) / ...
+                    max(handles.([head, 'refprofiles2'])(i,:)), 'blue');
                 
                 % Plot normalized measured data
-                plot(handles.([head, 'profiles2']){1}, ...
-                    handles.([head, 'profiles2']){i+1} / ...
-                    max(handles.([head, 'profiles2']){i+1}), 'red');
+                plot(handles.([head, 'profiles2'])(1,:)*10, ...
+                    handles.([head, 'profiles2'])(i,:) / ...
+                    max(handles.([head, 'profiles2'])(i,:)), 'red');
                 
                 % Plot gamma
-                plot(handles.([head, 'gamma2']){1}, ...
-                    handles.([head, 'gamma2']){i+1}, ...
+                plot(handles.([head, 'gamma2'])(1,:)*10, ...
+                    handles.([head, 'gamma2'])(i,:), ...
                     'Color', [0 0.75 0.75]);
             end
             
@@ -280,6 +287,7 @@ switch get(handles.([head, 'display']),'Value')
             xlabel('MLC X Position (mm)');
             xlim([-150 150]);
             grid on;
+            box on;
             
             % Turn on display
             set(allchild(handles.([head, 'axes'])), 'visible', 'on'); 
@@ -288,32 +296,33 @@ switch get(handles.([head, 'display']),'Value')
         
     % If the user chooses to view the dataset 3 profiles 
     case 6
+        
         % Log selection
         Event('Angle 3 profiles selected for display');
         
         % If the dataset exists
         if ~strcmp(get(handles.([head, 'file3']), 'String'), '') ...
                 && ~isempty(get(handles.([head, 'file3']), 'String'))
-
+        
             % Hold rendering for overlapping plots
             hold on;
             
             % Loop through each reference profile
-            for i = 1:length(handles.([head, 'refprofiles3']))
+            for i = 2:size(handles.([head, 'refprofiles3']), 1)
                 
                 % Plot normalized reference data
-                plot(handles.([head, 'refprofiles3']){i}.profile(1,:), ...
-                    handles.([head, 'refprofiles3']){i}.profile(2,:) / ...
-                    max(handles.([head, 'refprofiles3']){i}.profile(2,:)), 'blue');
+                plot(handles.([head, 'refprofiles3'])(1,:)*10, ...
+                    handles.([head, 'refprofiles3'])(i,:) / ...
+                    max(handles.([head, 'refprofiles3'])(i,:)), 'blue');
                 
                 % Plot normalized measured data
-                plot(handles.([head, 'profiles3']){1}, ...
-                    handles.([head, 'profiles3']){i+1} / ...
-                    max(handles.([head, 'profiles3']){i+1}), 'red');
+                plot(handles.([head, 'profiles3'])(1,:)*10, ...
+                    handles.([head, 'profiles3'])(i,:) / ...
+                    max(handles.([head, 'profiles3'])(i,:)), 'red');
                 
                 % Plot gamma
-                plot(handles.([head, 'gamma3']){1}, ...
-                    handles.([head, 'gamma3']){i+1}, ...
+                plot(handles.([head, 'gamma3'])(1,:)*10, ...
+                    handles.([head, 'gamma3'])(i,:), ...
                     'Color', [0 0.75 0.75]);
             end
             
@@ -327,6 +336,7 @@ switch get(handles.([head, 'display']),'Value')
             xlabel('MLC X Position (mm)');
             xlim([-150 150]);
             grid on;
+            box on;
             
             % Turn on display
             set(allchild(handles.([head, 'axes'])), 'visible', 'on'); 
@@ -335,6 +345,7 @@ switch get(handles.([head, 'display']),'Value')
         
     % If the user chooses to view the dataset 4 profiles     
     case 7
+        
         % Log selection
         Event('Angle 4 profiles selected for display');
         
@@ -346,21 +357,21 @@ switch get(handles.([head, 'display']),'Value')
             hold on;
             
             % Loop through each reference profile
-            for i = 1:length(handles.([head, 'refprofiles4']))
+            for i = 2:size(handles.([head, 'refprofiles4']), 1)
                 
                 % Plot normalized reference data
-                plot(handles.([head, 'refprofiles4']){i}.profile(1,:), ...
-                    handles.([head, 'refprofiles4']){i}.profile(2,:) / ...
-                    max(handles.([head, 'refprofiles4']){i}.profile(2,:)), 'blue');
+                plot(handles.([head, 'refprofiles4'])(1,:)*10, ...
+                    handles.([head, 'refprofiles4'])(i,:) / ...
+                    max(handles.([head, 'refprofiles4'])(i,:)), 'blue');
                 
                 % Plot normalized measured data
-                plot(handles.([head, 'profiles4']){1}, ...
-                    handles.([head, 'profiles4']){i+1} / ...
-                    max(handles.([head, 'profiles4']){i+1}), 'red');
+                plot(handles.([head, 'profiles4'])(1,:)*10, ...
+                    handles.([head, 'profiles4'])(i,:) / ...
+                    max(handles.([head, 'profiles4'])(i,:)), 'red');
                 
                 % Plot gamma
-                plot(handles.([head, 'gamma4']){1}, ...
-                    handles.([head, 'gamma4']){i+1}, ...
+                plot(handles.([head, 'gamma4'])(1,:)*10, ...
+                    handles.([head, 'gamma4'])(i,:), ...
                     'Color', [0 0.75 0.75]);
             end
             
@@ -374,6 +385,7 @@ switch get(handles.([head, 'display']),'Value')
             xlabel('MLC X Position (mm)');
             xlim([-150 150]);
             grid on;
+            box on;
             
             % Turn on display
             set(allchild(handles.([head, 'axes'])), 'visible', 'on'); 

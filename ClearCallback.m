@@ -24,8 +24,8 @@ function handles = ClearCallback(handles, head)
 for i = 1:4
     set(handles.(sprintf('%sangle%i', head, i)), 'Value', 1);
     set(handles.(sprintf('%sfile%i', head, i)), 'String', '');
-    handles.(sprintf('%sprofiles%i', head, i)) = cell();
-    handles.(sprintf('%sgamma%i', head, i)) = cell();
+    handles.(sprintf('%sprofiles%i', head, i)) = [];
+    handles.(sprintf('%sgamma%i', head, i)) = [];
 end
 
 % Call UpdateDisplay to clear plot

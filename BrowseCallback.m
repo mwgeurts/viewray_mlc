@@ -156,15 +156,24 @@ if iscell(name) || sum(name ~= 0)
     [results, refresults] = AnalyzeProfilerFields(data, refdata, 'max');
     
     % Set application specific data
-    handles.([head,'profiles',file]) = results.ydata;
-    handles.([head,'FWHM',file]) = results.yfwhm;
-    handles.([head,'X1',file]) = results.yedges(:,1);
-    handles.([head,'X2',file]) = results.yedges(:,2);
-    handles.([head,'gamma',file]) = results.ygamma;
-    handles.([head,'refprofiles',file]) = refresults.ydata;
-    handles.([head,'refFWHM',file]) = refresults.yfwhm;
-    handles.([head,'refX1',file]) = refresults.yedges(:,1);
-    handles.([head,'refX2',file]) = refresults.yedges(:,2);
+    if strcmp(handles.axis, 'x') || strcmp(handles.axis, 'y')
+        handles.([head,'profiles',file]) = results.([handles.axis,'data']);
+        handles.([head,'refprofiles',file]) = ...
+            refresults.([handles.axis,'data']);
+    else
+        handles.([head,'profiles',file]) = results.([handles.axis,'diag']);
+        handles.([head,'refprofiles',file]) = ...
+            refresults.([handles.axis,'diag']);
+    end
+    handles.([head,'FWHM',file]) = results.([handles.axis,'fwhm']);
+    handles.([head,'X1',file]) = results.([handles.axis,'edges'])(:,1);
+    handles.([head,'X2',file]) = results.([handles.axis,'edges'])(:,2);
+    handles.([head,'gamma',file]) = results.([handles.axis,'gamma']);
+    handles.([head,'refFWHM',file]) = refresults.([handles.axis,'fwhm']);
+    handles.([head,'refX1',file]) = ...
+        refresults.([handles.axis,'edges'])(:,1);
+    handles.([head,'refX2',file]) = ...
+        refresults.([handles.axis,'edges'])(:,2);
     
     % Loop through each gamma profile
     for i = 2:size(handles.([head,'gamma',file]),1)

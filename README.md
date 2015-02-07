@@ -2,18 +2,18 @@ ViewRay MLC Position Check
 ===========
 
 by Mark Geurts <mark.w.geurts@gmail.com>
-<br>Copyright &copy; 2014, University of Wisconsin Board of Regents
+<br>Copyright &copy; 2015, University of Wisconsin Board of Regents
 
 The ViewRay MLC Position Check loads Monte Carlo treatment planning data from the ViewRay&trade; Treatment Planning System and compares it to measured Sun Nuclear IC Profiler&trade; data to evaluate the positioning accuracy of each MLC bank.  To successfully process the data, six exposures must be acquired for a given head and gantry angle at the following MLC positions (in cm):
 
-| Strip   |	X1 (cm) |	 X2 (cm) |  Y1 (cm) |	 Y2 (cm) |
-----------|---------|----------|----------|----------|
-| Strip 1	|  -12.5  |   -7.5 	 |  -13.65	|  +13.65  |
-| Strip 2	|  -8.5	  |   -3.5	 |  -13.65	|  +13.65  |
-| Strip 3	|  -4.5	  |   +0.5 	 |  -13.65  |	 +13.65  |
-| Strip 4	|  -0.5   |	  +4.5   |	-13.65  |	 +13.65  |
-| Strip 5 |	 +3.5   |	  +8.5	 |  -13.65  |	 +13.65  |
-| Strip 6 |	 +7.5	  |  +12.5	 |  -13.65	|  +13.65  |
+| Strip   | X1 (cm) | X2 (cm) |  Y1 (cm) |  Y2 (cm) |
+----------|---------|---------|----------|----------|
+| Strip 1 |  -12.5  |  -7.5   |  -13.65  |  +13.65  |
+| Strip 2 |  -8.5   |  -3.5   |  -13.65  |  +13.65  |
+| Strip 3 |  -4.5   |  +0.5   |  -13.65  |  +13.65  |
+| Strip 4 |  -0.5   |  +4.5   |  -13.65  |  +13.65  |
+| Strip 5 |  +3.5   |  +8.5   |  -13.65  |  +13.65  |
+| Strip 6 |  +7.5   |  +12.5  |  -13.65  |  +13.65  |
 
 When measuring data with IC Profiler, it is assumed that the profiler will be positioned with the electronics pointing toward IEC-X for 0 and 180 degree gantry angles, toward IEC+Z for 90 and 270 degrees. Therefore, for 0 and 90 degree gantry angles, the Monte Carlo data calculated through the front of the IC Profiler is used.  For 180 degrees, the Monte Carlo data calculated through the couch and back of the profiler is used. For 270 degrees, the data calculated through the back of the profiler (but without the couch) is used.
 
@@ -30,9 +30,11 @@ When measuring data with IC Profiler, it is assumed that the profiler will be po
 
 ## Installation and Use
 
-To install this application, copy all MATLAB .m and .fig and the Reference folder contents into a directory with read/write access and then copy the [CalcGamma.m submodule from the gamma repository](https://github.com/mwgeurts/gamma) into the gamma subfolder.  If using git, execute `git clone --recursive https://github.com/mwgeurts/viewray_mlc`.
+To install this application, copy all MATLAB .m and .fig and the Reference folder contents into a directory with read/write access and then copy the [snc_extract](https://github.com/mwgeurts/snc_extract) and [gamma](https://github.com/mwgeurts/gamma) submodules into their respective subfolders.  If using git, execute `git clone --recursive https://github.com/mwgeurts/viewray_mlc`.
 
-To run this application, navigate to the installation path and execute `AnalyzeMLCProfiles` in MATLAB. Global configuration variables such as the default brose path can be modified by changing the values in `AnalyzeMLCProfiles_OpeningFcn` prior to execution.  A log file will automatically be created in the same directory and can be used for troubleshooting.  For instructions on acquiring the input data, see [Measurement Instructions](README.md#measurement-instructions). For information about software version and configuration pre-requisities, see [Compatibility and Requirements](README.md#compatibility-and-requirements).
+To run this application, navigate to the installation path and execute `AnalyzeMLCProfiles` in MATLAB.  For all full set of instructions on acquiring the input data, see [Measurement Instructions](README.md#measurement-instructions). This application can process both SNC PRM and ASCII data file formats. For each profile loaded, the closest matching reference file (based on the MLC positions described above) will be chosen and the field edges and FWHM will be compared.
+
+Global configuration variables such as the default brose path can be modified by changing the values in `AnalyzeMLCProfiles_OpeningFcn` prior to execution.  The assumed Profiler orientation can be changed from Y-axis to the X-axis (or diagonals) by adjusting `handles.rot` and `handles.axis` (refer to the source code documentation for more information). A log file will automatically be created in the same directory and can be used for troubleshooting. For information about software version and configuration pre-requisities, see [Compatibility and Requirements](README.md#compatibility-and-requirements).
 
 ## Compatibility and Requirements
 

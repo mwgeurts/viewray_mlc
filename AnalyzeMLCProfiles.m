@@ -121,19 +121,37 @@ set(handles.h2table, 'Data', cell(8,4));
 set(handles.h3table, 'Data', cell(8,4));
 
 %% Initialize global variables
+% Declare the initial path to search when browsing for input files.  This
+% path will automatically be set to the location of the most recent loaded
+% file during application execution.
 handles.path = userpath;
 Event(['Default file path set to ', handles.path]);
 
+% Declare Gamma analysis criteria
 handles.abs = 2.0; % percent
 handles.dta = 0.1; % cm
 Event(sprintf('Gamma criteria set to %0.1f%%/%0.1f mm', ...
     [handles.abs handles.dta*10]));
 
+% Declaure Gamma threshold. Reducing the range over which Gamma is reported
+% (to 80% for example) improves visualization of the different Gamma index
+% profiles when multiple profiles are plotted on the same axes.
 handles.thresh = 0.8;
 Event(sprintf('Gamma threshold set to %0.1f%%', handles.thresh * 100));
 
+% Declare the Profiler rotation. This factor will adjust how reference data
+% (computed by the TPS) is extracted for the Profiler axes. If the Profiler 
+% is aligned along the TPS axes, set to zero.  If the profiler is rotated
+% 90 degrees such that the Profiler Y axis is aligned to the TPS X axis,
+% set to 90.
 handles.rot = 90;
-Event(sprintf('IC Profiler rotation set to %0.1f degrees', handles.rot));
+Event(sprintf('Profiler rotation set to %0.1f degrees', handles.rot));
+
+% Declare the Profiler axis to use for analysis. This can be set to either
+% 'x', 'y', 'p', or 'n'.
+handles.axis = 'y';
+Event(sprintf('Analysis will be performed on Profiler %s axis', ...
+    handles.axis));
 
 %% Load submodules
 % Add snc_extract submodule to search path

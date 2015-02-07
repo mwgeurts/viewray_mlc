@@ -167,7 +167,7 @@ if exist('ParseSNCacm', 'file') ~= 2
 end
 
 % Check if Statistics Toolbox is installed
-if exist('corr', 'builtin') ~= 2
+if exist('corr', 'file') ~= 2
     
     % If not, throw an error
     Event(['The MATLAB Statistics Toolbox is not installed and is ', ...

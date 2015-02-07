@@ -1,5 +1,5 @@
 function handles = BrowseCallback(handles, head, file)
-% LoadSNCProfiles is called by AnalyzeMLCProfiles when the user selects a
+% BrowseCallback is called by AnalyzeMLCProfiles when the user selects a
 % Browse button to read SNC IC Profiler data.  The files themselves are 
 % parsed using the snc_extract submodule. The first input argument is the 
 % guidata handles structure, while the second and third are strings 

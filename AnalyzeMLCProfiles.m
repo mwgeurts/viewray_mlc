@@ -153,17 +153,25 @@ handles.axis = 'y';
 Event(sprintf('Analysis will be performed on Profiler %s axis', ...
     handles.axis));
 
-%% Load submodules
+%% Load submodules and toolboxes
 % Add snc_extract submodule to search path
 addpath('./snc_extract');
 
-% Check if MATLAB can find ParseSNCacm.m
+% Check if MATLAB can find ParseSNCacm
 if exist('ParseSNCacm', 'file') ~= 2
     
     % If not, throw an error
     Event(['The snc_extract submodule does not exist in the search path. ', ...
         'Use git clone --recursive or git submodule init followed by git ', ...
         'submodule update to fetch all submodules'], 'ERROR');
+end
+
+% Check if Statistics Toolbox is installed
+if exist('corr', 'builtin') ~= 2
+    
+    % If not, throw an error
+    Event(['The MATLAB Statistics Toolbox is not installed and is ', ...
+        'required for proper execution.'], 'ERROR');
 end
 
 %% Load reference profiles

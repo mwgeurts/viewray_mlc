@@ -54,7 +54,7 @@ if iscell(name) || sum(name ~= 0)
     
         % Update text box with first file
         set(handles.([head,'file',file]), 'String', ...
-            'Multiple files selected');
+            'Multiple PRM files selected');
         
         % Store filenames
         handles.([head,'names',file]) = name;

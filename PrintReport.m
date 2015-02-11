@@ -273,113 +273,152 @@ else
 end
 
 % If head 2 data was loaded
-if isfield(data, 'h2data') && ~isempty(data.h2data) > 0
+if (isfield(data, 'h2profiles1') && ~isempty(data.h2profiles1) > 0) || ...
+         (isfield(data, 'h2profiles2') && ~isempty(data.h2profiles2) > 0) || ...
+         (isfield(data, 'h2profiles3') && ~isempty(data.h2profiles3) > 0) || ...
+         (isfield(data, 'h2profiles4') && ~isempty(data.h2profiles4) > 0)
     
-    % Set file
-    set(handles.text28, 'String', get(data.h2file, 'String'));
+    % Initialize empty cell array for files
+    files = cell(0);
+    c = 0;
+
+    % Set files
+    for i = 1:4
+        
+        % If a file was loaded
+        if ~isempty(get(data.(sprintf('h2file%i', i)), 'String'))
+            
+            % Increment the counter
+            c = c + 1;
+            
+            % Store the file name
+            files{c} = get(data.(sprintf('h2file%i', i)), 'String');
+        end
+    end
     
-    % If data exists
-    if isfield(data, 'h2isoradius') && data.h2isoradius > 0 && ...
-            isfield(data, 'h2isocenter') && size(data.h2isocenter, 2) >= 2
-        
-        % Log event
-        Event('Plotting head 2 radiation isocenter');
+    set(handles.text28, 'String', strjoin(files, ', '));
+    
+    % Log event
+    Event('Plotting head 2 field edge offsets');
 
-        % Set axes
-        axes(handles.axes3);
+    % Set axes
+    axes(handles.axes3);
 
-        % Define square voxels
-        axis image;
-        
-        % Hold plot
-        hold on;
+    % Initialize empty cell array for legend entries
+    names = cell(0);
+    c = 0;
 
-        % Plot isocenter
-        [x, y] = pol2cart(linspace(0,2*pi,100), data.h2isoradius);
-        x = x + data.h2isocenter(1);
-        y = y + data.h2isocenter(2);
-        plot(y * 10, x * 10, '-r', 'LineWidth', 2);
+    % Hold rendering for overlapping plots
+    hold on;
 
-        % Plot field centers
-        for i = 1:size(data.h2alpha, 2)
-            [x, y]  = pol2cart(data.h2alpha(:,i)*pi/180, data.radius);
-            plot(y * 10, x * 10, '-', 'Color', cmap(min(i,size(cmap,1)),:));
-        end
+    % Loop through each dataset
+    for i = 1:4
 
-        % Set axis labels
-        xlabel('IEC X Axis (mm)');
-        ylabel('IEC Z Axis (mm)');
+        % If the dataset exists
+        if ~strcmp(get(data.(sprintf('h2file%i', i)), 'String'), '') ...
+                && ~isempty(get(data.(sprintf('h2file%i', i)), 'String'))
 
-        % Set plot options
-        xlim([-3 3]);
-        set(gca, 'XTick', -3:1:3);
-        ylim([-3 3]);
-        set(gca, 'YTick', -3:1:3);
-        hold off;
-        title('Head 2 Radiation Isocenter', 'FontSize', 9);
-        grid on;
+            % Increment the counter
+            c = c + 1;
 
-        % Turn on display
-        set(allchild(handles.axes3), 'visible', 'on'); 
-        set(handles.axes3, 'visible', 'on'); 
-        
-        % Log event
-        Event('Plotting head 2 MLC X Offsets');
+            % Plot the X1 field edge difference from reference
+            plot(data.(sprintf('h2refX1%i', i))*10, ...
+                (data.(sprintf('h2X1%i', i)) - ...
+                data.(sprintf('h2refX1%i', i)))*10, '-o', ...
+                'Color', cmap(c,:));
 
-        % Set axes
-        axes(handles.axes4);
+            % Add legend entry for X1
+            names{c} = sprintf('%i X1', ...
+                (get(data.(sprintf('h2angle%i', i)), ...
+                'Value') - 2) * 90);
 
-        % Initialize offset array
-        offsets = zeros(2, size(data.h2alpha, 2));
+            % Increment the counter
+            c = c + 1;
 
-        % Loop through angles
-        for i = 1:size(data.h2alpha, 2)
+            % Plot the X2 field edge difference from reference
+            plot(data.(sprintf('h2refX2%i', i))*10, ...
+                (data.(sprintf('h2X2%i', i)) - ...
+                data.(sprintf('h2refX2%i', i)))*10, '-o', ...
+                'Color', cmap(c,:));
 
-            % Convert points to cartesian coordinates
-            [x, y] = pol2cart(data.h2alpha(:,i)*pi/180, data.radius);
+            % Add legend entry for X2
+            names{c} = sprintf('%i X2', ...
+                (get(data.(sprintf('h2angle%i', i)), ...
+                'Value') - 2) * 90);
 
-            % Compute disance from line to radiation isocenter
-            offsets(1,i) = -((y(2)-y(1)) * ...
-                data.h2isocenter(1) - (x(2)-x(1)) * ...
-                data.h2isocenter(2) - x(1) * y(2) + x(2) ...
-                * y(1)) / sqrt((x(2)-x(1))^2 + (y(2)-y(1))^2);
-
-            % Compute central axis angle (for display)
-            if data.h2alpha(2,i) < ...
-                    data.h2alpha(1,i)
-                offsets(2,i) = (data.h2alpha(2,i) + ...
-                    data.h2alpha(1,i)+180)/2;
-            else
-                offsets(2,i) = (data.h2alpha(2,i) + ...
-                    data.h2alpha(1,i)-180)/2;
-            end
-        end
-
-        % Plot map
-        h = plot(offsets(2,:), offsets(1,:) * 10, 'o');
-        set(h, 'MarkerEdgeColor', 'b', 'MarkerFaceColor', 'b')
-        xlim([min(offsets(2,:))-0.1 max(offsets(2,:))+0.1]);
-        xlabel('Beam Angle (deg)');
-        ylim([-3 3]);
-        set(gca, 'YTick', -3:1:3);
-        title('Head 2 MLC X Offset (mm)', 'FontSize', 9);
-        grid on;
-
-        % Turn on display
-        set(allchild(handles.axes4), 'visible', 'on'); 
-        set(handles.axes4, 'visible', 'on'); 
+        end 
     end
 
+    % Finish specifying plot
+    hold off;
+    xlabel('Field Edge (mm)');
+    xlim([-150 150]);
+    ylabel('Field Edge Difference (mm)');
+    ylim([-3 3]);
+    if c > 0
+        legend(names);
+    end
+    grid on;
+    box on;
+
+    % Log event
+    Event('Plotting head 2 FWHM differences');
+
+    % Set axes
+    axes(handles.axes4);
+    
+    % Initialize empty cell array for legend entries
+    names = cell(0);
+    c = 0;
+
+    % Hold rendering for overlapping plots
+    hold on;
+
+    % Loop through each dataset
+    for i = 1:4
+
+        % If the dataset exists
+        if ~strcmp(get(data.(sprintf('h2file%i', i)), ...
+                'String'), '') && ~isempty(get(data.(sprintf(...
+                'h2file%i', i)), 'String'))
+            
+            % Increment the counter
+            c = c + 1;
+
+            % Plot the FWHM difference from reference
+            plot((data.(sprintf('h2FWHM%i', i)) - ...
+                data.(sprintf('h2refFWHM%i', i)))*10, '-o', ...
+                'Color', cmap(c,:));
+
+             % Add legend entry
+            names{c} = sprintf('%i', ...
+                (get(data.(sprintf('h2angle%i', i)), ...
+                'Value') - 2) * 90);
+        end 
+    end
+
+    % Finish specifying plot
+    hold off;
+    xlabel('Profile');
+    set(gca,'XTick', 1:1:6);
+    ylabel('FWHM Difference (mm)');
+    ylim([-3 3]);
+    if c > 0
+        legend(names);
+    end
+    grid on;
+    box on;
+    
     % Log start
     Event('Updating head 2 table statistics');
     
     % Add statistics table
     table = get(data.h2table, 'Data');
     set(handles.text31, 'String', sprintf('%s\n\n', table{1:7,1}));
-    set(handles.text32, 'String', sprintf('%s\n\n', table{1:7,2}));
+    set(handles.text32, 'String', sprintf('%s\n\n', table{1:7,4}));
     
     % Clear temporary variables
-    clear table h i offsets x y;
+    clear table h i names c;
 
 else
     
@@ -401,113 +440,152 @@ else
 end
 
 % If head 3 data was loaded
-if isfield(data, 'h3data') && ~isempty(data.h3data) > 0
+if (isfield(data, 'h3profiles1') && ~isempty(data.h3profiles1) > 0) || ...
+         (isfield(data, 'h3profiles2') && ~isempty(data.h3profiles2) > 0) || ...
+         (isfield(data, 'h3profiles3') && ~isempty(data.h3profiles3) > 0) || ...
+         (isfield(data, 'h3profiles4') && ~isempty(data.h3profiles4) > 0)
     
-    % Set file
-    set(handles.text34, 'String', get(data.h3file, 'String'));
+    % Initialize empty cell array for files
+    files = cell(0);
+    c = 0;
+
+    % Set files
+    for i = 1:4
+        
+        % If a file was loaded
+        if ~isempty(get(data.(sprintf('h3file%i', i)), 'String'))
+            
+            % Increment the counter
+            c = c + 1;
+            
+            % Store the file name
+            files{c} = get(data.(sprintf('h3file%i', i)), 'String');
+        end
+    end
     
-    % If data exists
-    if isfield(data, 'h3isoradius') && data.h3isoradius > 0 && ...
-            isfield(data, 'h3isocenter') && size(data.h3isocenter, 2) >= 2
-        
-        % Log event
-        Event('Plotting head 3 radiation isocenter');
+    set(handles.text34, 'String', strjoin(files, ', '));
+    
+    % Log event
+    Event('Plotting head 3 field edge offsets');
 
-        % Set axes
-        axes(handles.axes5);
+    % Set axes
+    axes(handles.axes5);
 
-        % Define square voxels
-        axis image;
-        
-        % Hold plot
-        hold on;
+    % Initialize empty cell array for legend entries
+    names = cell(0);
+    c = 0;
 
-        % Plot isocenter
-        [x, y] = pol2cart(linspace(0,2*pi,100), data.h3isoradius);
-        x = x + data.h3isocenter(1);
-        y = y + data.h3isocenter(2);
-        plot(y * 10, x * 10, '-r', 'LineWidth', 2);
+    % Hold rendering for overlapping plots
+    hold on;
 
-        % Plot field centers
-        for i = 1:size(data.h3alpha, 2)
-            [x, y]  = pol2cart(data.h3alpha(:,i)*pi/180, data.radius);
-            plot(y * 10, x * 10, '-', 'Color', cmap(min(i,size(cmap,1)),:));
-        end
+    % Loop through each dataset
+    for i = 1:4
 
-        % Set axis labels
-        xlabel('IEC X Axis (mm)');
-        ylabel('IEC Z Axis (mm)');
+        % If the dataset exists
+        if ~strcmp(get(data.(sprintf('h3file%i', i)), 'String'), '') ...
+                && ~isempty(get(data.(sprintf('h3file%i', i)), 'String'))
 
-        % Set plot options
-        xlim([-3 3]);
-        set(gca, 'XTick', -3:1:3);
-        ylim([-3 3]);
-        set(gca, 'YTick', -3:1:3);
-        hold off;
-        title('Head 3 Radiation Isocenter', 'FontSize', 9);
-        grid on;
+            % Increment the counter
+            c = c + 1;
 
-        % Turn on display
-        set(allchild(handles.axes5), 'visible', 'on'); 
-        set(handles.axes5, 'visible', 'on'); 
-        
-        % Log event
-        Event('Plotting head 3 MLC X Offsets');
+            % Plot the X1 field edge difference from reference
+            plot(data.(sprintf('h3refX1%i', i))*10, ...
+                (data.(sprintf('h3X1%i', i)) - ...
+                data.(sprintf('h3refX1%i', i)))*10, '-o', ...
+                'Color', cmap(c,:));
 
-        % Set axes
-        axes(handles.axes6);
+            % Add legend entry for X1
+            names{c} = sprintf('%i X1', ...
+                (get(data.(sprintf('h3angle%i', i)), ...
+                'Value') - 2) * 90);
 
-        % Initialize offset array
-        offsets = zeros(2, size(data.h3alpha, 2));
+            % Increment the counter
+            c = c + 1;
 
-        % Loop through angles
-        for i = 1:size(data.h3alpha, 2)
+            % Plot the X2 field edge difference from reference
+            plot(data.(sprintf('h3refX2%i', i))*10, ...
+                (data.(sprintf('h3X2%i', i)) - ...
+                data.(sprintf('h3refX2%i', i)))*10, '-o', ...
+                'Color', cmap(c,:));
 
-            % Convert points to cartesian coordinates
-            [x, y] = pol2cart(data.h3alpha(:,i)*pi/180, data.radius);
+            % Add legend entry for X2
+            names{c} = sprintf('%i X2', ...
+                (get(data.(sprintf('h3angle%i', i)), ...
+                'Value') - 2) * 90);
 
-            % Compute disance from line to radiation isocenter
-            offsets(1,i) = -((y(2)-y(1)) * ...
-                data.h3isocenter(1) - (x(2)-x(1)) * ...
-                data.h3isocenter(2) - x(1) * y(2) + x(2) ...
-                * y(1)) / sqrt((x(2)-x(1))^2 + (y(2)-y(1))^2);
-
-            % Compute central axis angle (for display)
-            if data.h3alpha(2,i) < ...
-                    data.h3alpha(1,i)
-                offsets(2,i) = (data.h3alpha(2,i) + ...
-                    data.h3alpha(1,i)+180)/2;
-            else
-                offsets(2,i) = (data.h3alpha(2,i) + ...
-                    data.h3alpha(1,i)-180)/2;
-            end
-        end
-
-        % Plot map
-        h = plot(offsets(2,:), offsets(1,:) * 10, 'o');
-        set(h, 'MarkerEdgeColor', 'b', 'MarkerFaceColor', 'b')
-        xlim([min(offsets(2,:))-0.1 max(offsets(2,:))+0.1]);
-        xlabel('Beam Angle (deg)');
-        ylim([-3 3]);
-        set(gca, 'YTick', -3:1:3);
-        title('Head 2 MLC X Offset (mm)', 'FontSize', 9);
-        grid on;
-
-        % Turn on display
-        set(allchild(handles.axes6), 'visible', 'on'); 
-        set(handles.axes6, 'visible', 'on'); 
+        end 
     end
 
+    % Finish specifying plot
+    hold off;
+    xlabel('Field Edge (mm)');
+    xlim([-150 150]);
+    ylabel('Field Edge Difference (mm)');
+    ylim([-3 3]);
+    if c > 0
+        legend(names);
+    end
+    grid on;
+    box on;
+
+    % Log event
+    Event('Plotting head 3 FWHM differences');
+
+    % Set axes
+    axes(handles.axes6);
+    
+    % Initialize empty cell array for legend entries
+    names = cell(0);
+    c = 0;
+
+    % Hold rendering for overlapping plots
+    hold on;
+
+    % Loop through each dataset
+    for i = 1:4
+
+        % If the dataset exists
+        if ~strcmp(get(data.(sprintf('h3file%i', i)), ...
+                'String'), '') && ~isempty(get(data.(sprintf(...
+                'h3file%i', i)), 'String'))
+            
+            % Increment the counter
+            c = c + 1;
+
+            % Plot the FWHM difference from reference
+            plot((data.(sprintf('h3FWHM%i', i)) - ...
+                data.(sprintf('h3refFWHM%i', i)))*10, '-o', ...
+                'Color', cmap(c,:));
+
+             % Add legend entry
+            names{c} = sprintf('%i', ...
+                (get(data.(sprintf('h3angle%i', i)), ...
+                'Value') - 2) * 90);
+        end 
+    end
+
+    % Finish specifying plot
+    hold off;
+    xlabel('Profile');
+    set(gca,'XTick', 1:1:6);
+    ylabel('FWHM Difference (mm)');
+    ylim([-3 3]);
+    if c > 0
+        legend(names);
+    end
+    grid on;
+    box on;
+    
     % Log start
     Event('Updating head 3 table statistics');
     
     % Add statistics table
     table = get(data.h3table, 'Data');
     set(handles.text37, 'String', sprintf('%s\n\n', table{1:7,1}));
-    set(handles.text38, 'String', sprintf('%s\n\n', table{1:7,2}));
+    set(handles.text38, 'String', sprintf('%s\n\n', table{1:7,4}));
     
     % Clear temporary variables
-    clear table h i offsets x y;
+    clear table h i names c;
 
 else
     

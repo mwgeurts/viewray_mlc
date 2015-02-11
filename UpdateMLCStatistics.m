@@ -115,7 +115,7 @@ Event(sprintf('%i X1, %i X2 offsets less than 1 mm', ...
 
 % Compute minimum field width differences
 c = c + 1;
-table{c,1} = 'Min field width difference (mm)';
+table{c,1} = 'Min field width diff (mm)';
 table{c,2} = '';
 table{c,3} = '';
 table{c,4} = sprintf('%0.2f', min(FWHMdiffs)*10);
@@ -123,7 +123,7 @@ Event(sprintf('Minimum FWHM difference computed as %0.3f', min(FWHMdiffs)*10));
 
 % Compute maximum field width differences
 c = c + 1;
-table{c,1} = 'Max field width difference (mm)';
+table{c,1} = 'Max field width diff (mm)';
 table{c,2} = '';
 table{c,3} = '';
 table{c,4} = sprintf('%0.2f', max(FWHMdiffs)*10);
@@ -131,7 +131,7 @@ Event(sprintf('Maximum FWHM difference computed as %0.3f', max(FWHMdiffs)*10));
 
 % Compute average field width differences
 c = c + 1;
-table{c,1} = 'Avg field width difference (mm)';
+table{c,1} = 'Avg field width diff (mm)';
 table{c,2} = '';
 table{c,3} = '';
 table{c,4} = sprintf('%0.2f', mean(FWHMdiffs)*10);

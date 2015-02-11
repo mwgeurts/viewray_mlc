@@ -101,6 +101,9 @@ if iscell(name) || sum(name ~= 0)
         
         % Load Profiler ASCII data
         data = ParseSNCtxt(handles.path, handles.([head,'names',file]){1});
+        handles.sncversion = data.version{1};
+        handles.collector = data.dmodel{1};
+        handles.serial = data.dserial{1};
         
     % Otherwise, assume files are PRM
     elseif ~isempty(regexpi(handles.([head,'names',file]){1}, '.prm$'))
@@ -116,6 +119,9 @@ if iscell(name) || sum(name ~= 0)
         
         % Load Profiler PRM data
         data = ParseSNCprm(handles.path, handles.([head,'names',file]));
+        handles.sncversion = data.version;
+        handles.collector = data.dmodel;
+        handles.serial = data.dserial;
     
     % Otherwise, unknown data was passed to function
     else
@@ -194,6 +200,9 @@ if iscell(name) || sum(name ~= 0)
     set(handles.([head,'display']), 'Value', 2);
     handles = UpdateDisplay(handles, head);
 
+    % Enable print button
+    set(handles.print_button, 'enable', 'on');
+    
     % Log event
     Event(sprintf('%s angle %s data loaded successfully in %0.3f seconds', ...
         head, file, toc(t)));

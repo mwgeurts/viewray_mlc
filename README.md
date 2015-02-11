@@ -38,7 +38,7 @@ Global configuration variables such as the default brose path can be modified by
 
 ## Compatibility and Requirements
 
-This tool has been tested with ViewRay version 3.5 treatment software and Sun Nuclear IC Profiler software version 3.3.1.31111 on MATLAB 8.3 through 8.5.  The Parallel Computing toolbox (version 6.4 through 6.6 tested) and a CUDA-compatible GPU are required to run GPU based interpolation (CPU interpolation is automatically supported if not present).
+This tool has been tested with ViewRay version 3.5 treatment software and Sun Nuclear IC Profiler software version 3.3.1.31111 on MATLAB 8.3 through 8.5 with the Statistics toolbox (version 9.1 tested) and Image Processing toolbox (versions 9.0 and 9.1 tested).  The Parallel Computing toolbox (version 6.4 through 6.6 tested) and a CUDA-compatible GPU are required to run GPU based interpolation (CPU interpolation is automatically supported if not present).  The Statistics toolbox is required for reference profile matching.  The Image Processing toolbox is required to use `dicominfo()` and `dicomread()`.
 
 ## Measurement Instructions
 

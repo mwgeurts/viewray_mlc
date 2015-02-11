@@ -38,7 +38,7 @@ function varargout = AnalyzeMLCProfiles(varargin)
 % You should have received a copy of the GNU General Public License along 
 % with this program. If not, see http://www.gnu.org/licenses/.
 
-% Last Modified by GUIDE v2.5 10-Oct-2014 14:40:00
+% Last Modified by GUIDE v2.5 07-Feb-2015 15:24:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -106,6 +106,9 @@ Event(string, 'INIT');
 %% Initialize UI
 % Set version UI text
 set(handles.version_text, 'String', sprintf('Version %s', handles.version));
+
+% Disable print button
+set(handles.print_button, 'enable', 'off');
 
 % Turn off images
 set(allchild(handles.h1axes), 'visible', 'off'); 
@@ -957,3 +960,15 @@ end
 
 % Clear temporary variables
 clear pos;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function print_button_Callback(~, ~, handles)
+% hObject    handle to print_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Log event
+Event('Print button selected');
+
+% Execute PrintReport, passing current handles structure as data
+PrintReport('Data', handles);

@@ -166,8 +166,8 @@ Event(sprintf('Analysis will be performed on Profiler %s axis', ...
 % Add snc_extract submodule to search path
 addpath('./snc_extract');
 
-% Check if MATLAB can find ParseSNCacm
-if exist('ParseSNCacm', 'file') ~= 2
+% Check if MATLAB can find ParseSNCprm
+if exist('ParseSNCprm', 'file') ~= 2
     
     % If not, throw an error
     Event(['The snc_extract submodule does not exist in the search path. ', ...

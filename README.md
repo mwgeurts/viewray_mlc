@@ -17,7 +17,7 @@ The ViewRay MLC Position Check loads Monte Carlo treatment planning data from th
 
 When measuring data with IC Profiler, it is assumed that the profiler will be positioned with the electronics pointing toward IEC-X for 0 and 180 degree gantry angles, toward IEC+Z for 90 and 270 degrees. Therefore, for 0 and 90 degree gantry angles, the Monte Carlo data calculated through the front of the IC Profiler is used.  For 180 degrees, the Monte Carlo data calculated through the couch and back of the profiler is used. For 270 degrees, the data calculated through the back of the profiler (but without the couch) is used.
 
-IC Profiler is a trademark of Sun Nuclear Corporation.  MATLAB&reg; is a registered trademark of MathWorks Inc.
+IC Profiler is a trademark of Sun Nuclear Corporation. MATLAB&reg; is a registered trademark of MathWorks Inc. ViewRay is a trademark of ViewRay Incorporated.
 
 ## Contents
 

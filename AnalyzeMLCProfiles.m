@@ -71,7 +71,11 @@ function AnalyzeMLCProfiles_OpeningFcn(hObject, ~, handles, varargin)
 handles.output = hObject;
 
 % Set version handle
+<<<<<<< HEAD
 handles.version = '1.1.1';
+=======
+handles.version = '1.1.2';
+>>>>>>> report
 
 % Determine path of current application
 [path, ~, ~] = fileparts(mfilename('fullpath'));
@@ -167,7 +171,8 @@ Event(sprintf('Analysis will be performed on Profiler %s axis', ...
 addpath('./snc_extract');
 
 % Check if MATLAB can find ParseSNCprm
-if exist('ParseSNCprm', 'file') ~= 2
+if exist('ParseSNCprm', 'file') ~= 2 || (~isempty(varargin) && ...
+        strcmp(varargin{1}, 'unitParseSNCprm'))
     
     % If not, throw an error
     Event(['The snc_extract submodule does not exist in the search path. ', ...
@@ -176,7 +181,8 @@ if exist('ParseSNCprm', 'file') ~= 2
 end
 
 % Check if Statistics Toolbox is installed
-if exist('corr', 'file') ~= 2
+if exist('corr', 'file') ~= 2 || (~isempty(varargin) && ...
+        strcmp(varargin{1}, 'unitCorr'))
     
     % If not, throw an error
     Event(['The MATLAB Statistics Toolbox is not installed and is ', ...

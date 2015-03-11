@@ -71,11 +71,7 @@ function AnalyzeMLCProfiles_OpeningFcn(hObject, ~, handles, varargin)
 handles.output = hObject;
 
 % Set version handle
-<<<<<<< HEAD
-handles.version = '1.1.1';
-=======
 handles.version = '1.1.2';
->>>>>>> report
 
 % Determine path of current application
 [path, ~, ~] = fileparts(mfilename('fullpath'));

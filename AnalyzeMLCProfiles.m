@@ -162,6 +162,10 @@ handles.axis = 'y';
 Event(sprintf('Analysis will be performed on Profiler %s axis', ...
     handles.axis));
 
+% Unit test flag. This will be set to 1 if the application is being run as
+% part of unit testing (see UnitTest for more information)
+handles.unitflag = 0;
+
 %% Load submodules and toolboxes
 % Add snc_extract submodule to search path
 addpath('./snc_extract');

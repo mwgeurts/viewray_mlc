@@ -124,6 +124,11 @@ results = cell(0,3);
 % Initialize footnotes cell array
 footnotes = cell(0,1);
 
+% Initialize reference structure
+if nargout == 4
+    reference = struct;
+end
+
 % Add snc_extract/gamma submodule to search path
 addpath('./snc_extract/gamma');
 
@@ -246,10 +251,8 @@ results{size(results,1),3} = pf;
 
 % Add application load time
 results{size(results,1)+1,1} = '2';
-results{size(results,1),2} = 'Application Load Time<sup>1</sup>';
+results{size(results,1),2} = 'Application Load Time';
 results{size(results,1),3} = time;
-footnotes{length(footnotes)+1} = ['<sup>1</sup>Prior to Version 1.1 ', ...
-    'only the 27.3 cm x 27.3 cm reference profile existed'];
 
 %% TEST 3/4: Code Analyzer Messages, Cumulative Cyclomatic Complexity
 %
@@ -310,7 +313,6 @@ for i = 1:length(fList)
                 mess = mess + 1;
             end
         end
-        
     end
 end
 
@@ -323,6 +325,7 @@ results{size(results,1),3} = sprintf('%i', mess);
 results{size(results,1)+1,1} = '4';
 results{size(results,1),2} = 'Cumulative Cyclomatic Complexity';
 results{size(results,1),3} = sprintf('%i', comp);
+
 
 %% Finish up
 % Close all figures

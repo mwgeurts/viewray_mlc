@@ -86,7 +86,7 @@ if nargin == 0
     % Declare prior version directories
     varargout{3} = {
         '../viewray_mlc-1.0'
-        '../viewray_mlc-1.1'
+%       '../viewray_mlc-1.1'
         '../viewray_mlc-1.1.1'
     };
 
@@ -147,7 +147,7 @@ end
 %   errors are present if the required submodules do not exist and that the
 %   print report button is initially disabled.
 %
-% RELEVANT REQUIREMENTS:
+% RELEVANT REQUIREMENTS: U001, F001, F024, F030, P001
 %
 % INPUT DATA: No input data required
 %
@@ -326,6 +326,219 @@ results{size(results,1)+1,1} = '4';
 results{size(results,1),2} = 'Cumulative Cyclomatic Complexity';
 results{size(results,1),3} = sprintf('%i', comp);
 
+%% TEST 5: Reference Data Loads Successfully
+%
+% DESCRIPTION: This unit test verifies that the reference data load
+% subfunction runs without error.
+%
+% RELEVANT REQUIREMENTS: F002
+%
+% INPUT DATA: file names of reference profiles.  In version 1.1.0 and
+%   later, this is stored in handles.references.  In earlier versions the
+%   file name is written into the function call.
+%
+% CONDITION A (+): Execute LoadProfilerReference (version 1.1.0 and later)
+%   or LoadReferenceProfiles with a valid reference DICOM file and verify
+%   that the application executes correctly.
+%
+% CONDITION B (-): Execute the same function with invalid inputs and verify
+%   that the function fails.
+
+% Retrieve guidata
+data = guidata(h);
+    
+% If version >= 1.1.0
+if version >= 010100
+
+    % Execute LoadProfilerReference in try/catch statement
+    try
+        pf = pass;
+        LoadProfilerDICOMReference(data.APfiles, '90');
+        LoadProfilerDICOMReference(data.PANCfiles, '90');
+        LoadProfilerDICOMReference(data.PATCfiles, '90');
+    
+    % If it errors, record fail
+    catch
+        pf = fail;
+    end
+  
+    % Execute LoadProfilerReference with no inputs in try/catch statement
+    try
+        LoadProfilerDICOMReference();
+        pf = fail;
+    catch
+        % If it fails, test passed
+    end
+    
+    % Execute LoadProfilerReference with one incorrect input in try/catch 
+    % statement
+    try
+        LoadProfilerDICOMReference({'asd'});
+        pf = fail;
+    catch
+        % If it fails, test passed
+    end
+    
+% If version < 1.1.0    
+else
+    
+    % Execute LoadReferenceProfiles in try/catch statement
+    try
+        pf = pass;
+        LoadReferenceProfiles(data);
+    
+    % If it errors, record fail
+    catch
+        pf = fail;
+    end
+end
+
+% Add success message
+results{size(results,1)+1,1} = '5';
+results{size(results,1),2} = 'Reference Data Loads Successfully';
+results{size(results,1),3} = pf;
+
+%% TEST 6/7/8: Reference Data Identical
+%
+% DESCRIPTION: This unit test verifies that the MLC-X axis data extracted 
+%   from the reference data is identical to its expected value.  For this 
+%   test equivalency is defined as being within 1%/0.1mm using a Gamma 
+%   analysis.
+%
+% RELEVANT REQUIREMENTS: F002, C014, C015, C016
+%
+% INPUT DATA: Validated expected AP (data.APreferences.ydata), PA no couch
+%   (data.PANCreferences.panc.ydata), and PA thru couch 
+%   (data.PANCreferences.patc.ydata) data
+%
+% CONDITION A (+): The extracted reference data matches expected MLC X data
+%   exactly (version 1.1.0 and later) or within 1%/0.1 mm.
+%
+% CONDITION B (-): Modified reference data no longer matches expected MLC X
+%   data.
+
+% Retrieve guidata
+data = guidata(h);
+    
+% If version >= 1.1.0
+if version >= 010100
+    
+    % If reference data exists
+    if nargin == 3
+
+        % If current value equals the reference
+        if isequal(data.APreferences.ydata, varargin{3}.APreferences.ydata)
+            appf = pass;
+
+        % Otherwise, it failed
+        else
+            appf = fail;
+        end
+        
+        % Modify refdata
+        data.APreferences.ydata(1,1) = 0;
+        
+        % Verify current value now fails
+        if isequal(data.APreferences.ydata, ...
+                varargin{3}.APreferences.ydata)
+            appf = fail;
+        end
+        
+        % If current value equals the reference
+        if isequal(data.PANCreferences.ydata, ...
+                varargin{3}.PANCreferences.ydata)
+            pancpf = pass;
+
+        % Otherwise, it failed
+        else
+            pancpf = fail;
+        end
+        
+        % Modify refdata
+        data.PANCreferences.ydata(1,1) = 0;
+        
+        % Verify current value now fails
+        if isequal(data.PANCreferences.ydata, ...
+                varargin{3}.PANCreferences.ydata)
+            pancpf = fail;
+        end
+        
+        % If current value equals the reference
+        if isequal(data.PATCreferences.ydata, ...
+                varargin{3}.PATCreferences.ydata)
+            patcpf = pass;
+
+        % Otherwise, it failed
+        else
+            patcpf = fail;
+        end
+        
+        % Modify refdata
+        data.PATCreferences.ydata(1,1) = 0;
+        
+        % Verify current value now fails
+        if isequal(data.PATCreferences.ydata, ...
+                varargin{3}.PATCreferences.ydata)
+            patcpf = fail;
+        end
+        
+    % Otherwise, no reference data exists
+    else
+
+        % Set current value as reference
+        reference.APreferences = data.APreferences;
+        reference.PANCreferences = data.PANCreferences;
+        reference.PATCreferences = data.PATCreferences;
+
+        % Assume pass
+        appf = pass;
+        pancpf = pass;
+        patcpf = pass;
+
+        % Add reference profiles to preamble
+        preamble{length(preamble)+1} = ['| AP Reference&nbsp;Data | ', ...
+            data.APfiles{1}, '<br>', strjoin(data.APfiles(2:end), ...
+            '<br>'), ' |'];
+        preamble{length(preamble)+1} = ['| PANC Reference&nbsp;Data | ', ...
+            data.PANCfiles{1}, '<br>', strjoin(data.PANCfiles(2:end), ...
+            '<br>'), ' |'];
+        preamble{length(preamble)+1} = ['| PATC Reference&nbsp;Data | ', ...
+            data.PATCfiles{1}, '<br>', strjoin(data.PATCfiles(2:end), ...
+            '<br>'), ' |'];
+    end
+
+% If version < 1.1.0    
+else
+    
+    % If reference data exists
+    if nargin == 3
+        
+        appf = unk;
+        pancpf = unk;
+        patcpf = unk;
+        
+    % Otherwise, no reference data exists
+    else
+        appf = unk;
+        pancpf = unk;
+        patcpf = unk;
+    end
+end
+       
+% Add result
+results{size(results,1)+1,1} = '6';
+results{size(results,1),2} = 'AP Reference Data within 1%/0.1 mm';
+results{size(results,1),3} = appf;
+
+% Add result
+results{size(results,1)+1,1} = '7';
+results{size(results,1),2} = 'PANC Reference Data within 1%/0.1 mm';
+results{size(results,1),3} = pancpf;
+
+% Add result
+results{size(results,1)+1,1} = '8';
+results{size(results,1),2} = 'PATC Reference Data within 1%/0.1 mm';
+results{size(results,1),3} = patcpf;
 
 %% Finish up
 % Close all figures

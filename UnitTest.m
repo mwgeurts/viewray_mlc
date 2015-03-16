@@ -93,14 +93,14 @@ if nargin == 0
     % Declare location of test data. Column 1 is the name of the 
     % test suite, column 2 is the absolute path to the file(s)
     varargout{4} = {
-        'AP'     './test_data/Head1_G90.txt'
-        'PA (thru couch)'     './test_data/Head2_G180.txt'
-        'PA (no couch)'     './test_data/Head3_G270_through_back_of_ICP.txt'
+        'AP'     '../test_data/Head1_G90.txt'
+        'PA (thru couch)'     '../test_data/Head2_G180.txt'
+        'PA (no couch)'     '../test_data/Head3_G270_through_back_of_ICP.txt'
     };
 
     % Declare name of report file (will be appended by _R201XX.md based on 
     % the MATLAB version)
-    varargout{5} = './test_reports/unit_test';
+    varargout{5} = '../test_reports/unit_test';
     
     % Return to invoking function
     return;

@@ -540,6 +540,173 @@ results{size(results,1)+1,1} = '8';
 results{size(results,1),2} = 'PATC Reference Data within 1%/0.1 mm';
 results{size(results,1),3} = patcpf;
 
+%% TEST 9/10: H1 Browse Loads Data Successfully/Load Time
+%
+% DESCRIPTION: This unit test verifies a callback exists for the H1 browse
+%   button and executes it under unit test conditions (such that a file 
+%   selection dialog box is skipped), simulating the process of a user
+%   selecting input data.  The time necessary to load the file is also
+%   checked.
+%
+% RELEVANT REQUIREMENTS: U002, U003, U005, U006, F003, F004, F006, F010, 
+%   P002, C012
+%
+% INPUT DATA: ASCII file to be loaded (varargin{2})
+%
+% CONDITION A (+): The callback for the H1 browse button can be executed
+%   without error when a valid filename is provided
+%
+% CONDITION B (-): The callback will throw an error if an invalid filename
+%   is provided
+%
+% CONDITION C (+): The callback will return without error when no filename
+%   is provided
+%
+% CONDITION D (+): Upon receiving a valid filename, the ASCII data will be
+%   automatically processed, storing a structure to data.h1results
+%
+% CONDITION E (+): Upon receiving a valid filename, the filename will be
+%   displayed on the user interface
+%
+% CONDITION F (+): Report the time taken to execute the browse callback and 
+%   parse the data
+%
+% CONDITION G (-): If measured data is provided where the FWHM is too close
+%   to the edge, the application will return a FWHM of 0. 
+%
+% CONDITION H (+): Correlation data will exist in data.h1results.corr
+
+% Retrieve guidata
+data = guidata(h);
+    
+% Retrieve callback to H1 browse button
+callback = get(data.h1browse1, 'Callback');
+
+% Set empty unit path/name
+data.unitpath = '';
+data.unitname = '';
+data.unitgantry = 2;
+
+% Force specific gamma criteria (3%/1mm)
+data.abs = 3;
+
+% If version >= 1.1.0
+if version >= 010100
+    
+    % Store DTA in cm
+    data.dta = 0.1;
+else
+    
+    % Store DTA in mm
+    data.dta = 1;
+end
+
+% Add gamma criteria to preamble
+preamble{length(preamble)+1} = '| Gamma Criteria | 3%/1mm |';
+
+% Store guidata
+guidata(h, data);
+
+% Execute callback in try/catch statement
+try
+    pf = pass;
+    callback(data.h1browse1, data);
+
+% If it errors, record fail
+catch
+    pf = fail;
+end
+
+% Set invalid unit path/name
+data.unitpath = '/';
+data.unitname = 'asd';
+
+% Store guidata
+guidata(h, data);
+
+% Execute callback in try/catch statement (this should fail)
+try
+    callback(data.h1browse1, data);
+    pf = fail;
+    
+% If it errors
+catch
+	% The test passed
+end
+
+% Set unit path/name
+[path, name, ext] = fileparts(varargin{2});
+data.unitpath = path;
+data.unitname = [name, ext];
+
+% Store guidata
+guidata(h, data);
+
+% Execute callback in try/catch statement
+try
+    t = tic;
+    callback(data.h1browse1, data);
+
+% If it errors, record fail
+catch
+    pf = fail;
+end
+
+% Record completion time
+time = sprintf('%0.1f sec', toc(t));
+
+% Retrieve guidata
+data = guidata(h);
+
+% Verify that the file name matches the input data
+if strcmp(pf, pass) && strcmp(data.h1file1.String, fullfile(varargin{2}))
+    pf = pass;
+else
+    pf = fail;
+end
+
+% If version >= 1.1.0, execute SRS-F010 test
+if version >= 010100
+    
+    % Load the SNC profiler data
+    txt = ParseSNCtxt(data.unitpath, data.unitname);
+
+    % Adjust the data such that the X axis profile is uniform (no edges)
+    txt.ydata(:, 2) = ones(size(txt.ydata,1), 1);
+
+    % Run AnalyzeProfilerFields with bad X axis data
+    result = AnalyzeProfilerFields(txt);
+
+    % Verify FWHM is zero
+    if result.yfwhm(1) ~= 0
+        pf = fail;
+    end
+
+    % Adjust the data such that the X axis profile is uniform (no edges)
+    txt.ydata(2:end, 2) = ones(size(txt.ydata,1)-1, 1) * 3;
+
+    % Run AnalyzeProfilerFields with bad X axis data
+    result = AnalyzeProfilerFields(txt);
+
+    % Verify FWHM is zero
+    if result.yfwhm ~= 0
+        pf = fail;
+    end
+
+    % Clear temporary variables
+    clear txt result;
+end
+
+% Add result
+results{size(results,1)+1,1} = '9';
+results{size(results,1),2} = 'H1 Browse 1 Loads Data Successfully';
+results{size(results,1),3} = pf;
+
+% Add result
+results{size(results,1)+1,1} = '10';
+results{size(results,1),2} = 'Browse Callback Load Time';
+results{size(results,1),3} = time;
+
 %% Finish up
 % Close all figures
 close all force;

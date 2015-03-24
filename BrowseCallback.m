@@ -29,11 +29,21 @@ function handles = BrowseCallback(handles, head, file)
 % Log event
 Event([head, ' angle ', file, ' browse button selected']);
 
-% Request the user to select the SNC Profiler ASCII or PRM file
-Event('UI window opened to select file');
-[name, path] = uigetfile({'*.txt', 'ASCII file export'; '*.prm', ...
-    'Profiler Movie File'}, 'Select SNC Profiler data', handles.path, ...
-    'MultiSelect', 'on');
+% If not executing in unit test
+if handles.unitflag == 0
+    
+    % Request the user to select the SNC Profiler ASCII or PRM file
+    Event('UI window opened to select file');
+    [name, path] = uigetfile({'*.txt', 'ASCII file export'; '*.prm', ...
+        'Profiler Movie File'}, 'Select SNC Profiler data', handles.path, ...
+        'MultiSelect', 'on');
+else
+    
+    % Log unit test
+    Event('Retrieving stored name and path variables', 'UNIT');
+    name = handles.unitname;
+    path = handles.unitpath;
+end
 
 % If a file was selected
 if iscell(name) || sum(name ~= 0)
@@ -71,11 +81,21 @@ if iscell(name) || sum(name ~= 0)
     % Check if an angle was selected
     if get(handles.([head,'angle',file]), 'Value') == 1
         
-        % Log action
-        Event('No angle was selected, prompting user via UI');
-        
-        % If not set, ask the user to select a gantry angle
-        gantry = menu('Select the Gantry Angle:', '0', '90', '180', '270');
+        % If not executing in unit test
+        if handles.unitflag == 0
+            
+            % Log action
+            Event('No angle was selected, prompting user via UI');
+
+            % If not set, ask the user to select a gantry angle
+            gantry = ...
+                menu('Select the Gantry Angle:', '0', '90', '180', '270');
+        else
+            
+            % Log unit test
+            Event('Retrieving gantry angle', 'UNIT');
+            gantry = handles.unitgantry;
+        end
         
         % Update the gantry angle
         set(handles.([head,'angle',file]), 'Value', gantry + 1);

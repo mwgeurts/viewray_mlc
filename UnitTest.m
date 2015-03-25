@@ -113,7 +113,7 @@ end
 % Initialize static test result text variables
 pass = 'Pass';
 fail = 'Fail';
-unk = 'N/A'; %#ok<NASGU>
+unk = 'N/A';
 
 % Initialize preamble text
 preamble = {
@@ -128,7 +128,9 @@ results = cell(0,3);
 footnotes = cell(0,1);
 
 % Initialize reference structure
-if nargout == 4
+if nargin == 3
+    reference = varargin{3};
+else
     reference = struct;
 end
 
@@ -430,7 +432,7 @@ if version >= 010100
     if nargin == 3
 
         % If current value equals the reference
-        if isequal(data.APreferences.ydata, varargin{3}.APreferences.ydata)
+        if isequal(data.APreferences.ydata, reference.APreferences.ydata)
             appf = pass;
 
         % Otherwise, it failed
@@ -443,13 +445,13 @@ if version >= 010100
         
         % Verify current value now fails
         if isequal(data.APreferences.ydata, ...
-                varargin{3}.APreferences.ydata)
+                reference.APreferences.ydata)
             appf = fail;
         end
         
         % If current value equals the reference
         if isequal(data.PANCreferences.ydata, ...
-                varargin{3}.PANCreferences.ydata)
+                reference.PANCreferences.ydata)
             pancpf = pass;
 
         % Otherwise, it failed
@@ -462,13 +464,13 @@ if version >= 010100
         
         % Verify current value now fails
         if isequal(data.PANCreferences.ydata, ...
-                varargin{3}.PANCreferences.ydata)
+                reference.PANCreferences.ydata)
             pancpf = fail;
         end
         
         % If current value equals the reference
         if isequal(data.PATCreferences.ydata, ...
-                varargin{3}.PATCreferences.ydata)
+                reference.PATCreferences.ydata)
             patcpf = pass;
 
         % Otherwise, it failed
@@ -481,7 +483,7 @@ if version >= 010100
         
         % Verify current value now fails
         if isequal(data.PATCreferences.ydata, ...
-                varargin{3}.PATCreferences.ydata)
+                reference.PATCreferences.ydata)
             patcpf = fail;
         end
         
@@ -499,15 +501,15 @@ if version >= 010100
         patcpf = pass;
 
         % Add reference profiles to preamble
-        preamble{length(preamble)+1} = ['| AP Reference&nbsp;Data | ', ...
-            data.APfiles{1}, '<br>', strjoin(data.APfiles(2:end), ...
-            '<br>'), ' |'];
-        preamble{length(preamble)+1} = ['| PANC Reference&nbsp;Data | ', ...
-            data.PANCfiles{1}, '<br>', strjoin(data.PANCfiles(2:end), ...
-            '<br>'), ' |'];
-        preamble{length(preamble)+1} = ['| PATC Reference&nbsp;Data | ', ...
-            data.PATCfiles{1}, '<br>', strjoin(data.PATCfiles(2:end), ...
-            '<br>'), ' |'];
+%         preamble{length(preamble)+1} = ['| AP Reference&nbsp;Data | ', ...
+%             data.APfiles{1}, '<br>', strjoin(data.APfiles(2:end), ...
+%             '<br>'), ' |'];
+%         preamble{length(preamble)+1} = ['| PANC Reference&nbsp;Data | ', ...
+%             data.PANCfiles{1}, '<br>', strjoin(data.PANCfiles(2:end), ...
+%             '<br>'), ' |'];
+%         preamble{length(preamble)+1} = ['| PATC Reference&nbsp;Data | ', ...
+%             data.PATCfiles{1}, '<br>', strjoin(data.PATCfiles(2:end), ...
+%             '<br>'), ' |'];
     end
 
 % If version < 1.1.0    
@@ -637,6 +639,9 @@ catch
 	% The test passed
 end
 
+% Add file name to preamble
+preamble{length(preamble)+1} = ['| Input&nbsp;Data | ', varargin{2}, ' | '];
+
 % Set unit path/name
 [path, name, ext] = fileparts(varargin{2});
 data.unitpath = path;
@@ -709,6 +714,218 @@ results{size(results,1),3} = pf;
 results{size(results,1)+1,1} = '10';
 results{size(results,1),2} = 'Browse Callback Load Time';
 results{size(results,1),3} = time;
+
+%% TEST 11/12: MLC X field edges/FWHM/differences correct
+%
+% DESCRIPTION: This unit test verifies that the field edges and FWHM for
+%   the measured and reference profiles, and resulting differences, are
+%   computed correctly.
+%
+% RELEVANT REQUIREMENTS: F007, F008, F009, F011, F012, F013
+%
+% INPUT DATA: reference.h1X11, reference.h1X21, reference.h1refX11, 
+%   reference.h1refX21, reference.h1FWHM1, reference.h1refFWHM1
+%
+% CONDITION A (+): Computed reference field edges are within 0.1 mm
+%
+% CONDITION B (+): Computed measured field edges are within 0.1 mm
+%
+% CONDITION C (+): Computed reference field widths are within 0.1 mm
+%
+% CONDITION D (+): Computed measured field widths are within 0.1 mm
+
+% Retrieve guidata
+data = guidata(h);
+
+% In version >= 1.1.0, values are stored in cm
+if version >= 010100
+    
+    % If reference data exists
+    if nargin == 3
+
+        % If the values are within 0.1 mm of the reference
+        if max(abs(data.h1X11 - reference.h1X11)) < 0.01 && ...
+                max(abs(data.h1X21 - reference.h1X21)) < 0.01 && ...
+                max(abs(data.h1refX11 - reference.h1refX11)) < 0.01 && ...
+                max(abs(data.h1refX21 - reference.h1refX21)) < 0.01
+            
+            % The test passes
+            pf = pass;
+        
+        % Otherwise, the test fails
+        else
+            pf = fail;
+        end
+        
+    % Otherwise, set reference data    
+    else
+        
+        % Store current values as reference
+        reference.h1X11 = data.h1X11;
+        reference.h1X21 = data.h1X21;
+        reference.h1refX11 = data.h1refX11;
+        reference.h1refX21 = data.h1refX21;
+        pf = pass;
+    end
+   
+% Otherwise, values are in mm
+else
+    
+    % If reference data exists
+    if nargin == 3
+    
+        % If the values are within 0.1 mm of the reference
+        if max(abs(data.h1X11/10 - reference.h1X11')) < 0.01 && ...
+                max(abs(data.h1X21/10 - reference.h1X21')) < 0.01 && ...
+                max(abs(data.h1refX11/10 - reference.h1refX11')) < 0.01 && ...
+                max(abs(data.h1refX21/10 - reference.h1refX21')) < 0.01
+            
+            % The test passes
+            pf = pass;
+        
+        % Otherwise, the test fails
+        else
+            pf = fail;
+        end
+            
+    % Otherwise, set reference data
+    else
+        
+        % Store current values in cm as reference
+        reference.h1X11 = data.h1X11'/10;
+        reference.h1X21 = data.h1X21'/10;
+        reference.h1refX11 = data.h1refX11'/10;
+        reference.h1refX21 = data.h1refX21'/10;
+        pf = pass;
+    end
+end
+
+% Add result
+results{size(results,1)+1,1} = '11';
+results{size(results,1),2} = 'Field Edges within 0.1 mm';
+results{size(results,1),3} = pf;
+
+% In version >= 1.1.0, values are stored in cm
+if version >= 010100
+    
+    % If reference data exists
+    if nargin == 3
+
+        % If the values are within 0.1 mm of the reference
+        if max(abs(data.h1FWHM1 - reference.h1FWHM1)) < 0.01 && ...
+                max(abs(data.h1refFWHM1 - reference.h1refFWHM1)) < 0.01
+            
+            % The test passes
+            pf = pass;
+        
+        % Otherwise, the test fails
+        else
+            pf = fail;
+        end
+      
+    % Otherwise, set reference data
+    else
+        
+        % Store current values as reference
+        reference.h1FWHM1 = data.h1FWHM1;
+        reference.h1refFWHM1 = data.h1refFWHM1;
+        pf = pass;
+    end
+   
+% Otherwise, values are in mm
+else
+    
+    % If reference data exists
+    if nargin == 3
+        
+        % If the values are within 0.1 mm of the reference
+        if max(abs(data.h1FWHM1/10 - reference.h1FWHM1')) < 0.01 && ...
+                max(abs(data.h1refFWHM1/10 - reference.h1refFWHM1')) < 0.01
+
+            % The test passes
+            pf = pass;
+
+        % Otherwise, the test fails
+        else
+            pf = fail;
+        end
+
+    % Otherwise, set reference data
+    else
+        
+        % Store current values in cm as reference
+        reference.h1FWHM1 = data.h1FWHM1'/10;
+        reference.h1refFWHM1 = data.h1refFWHM1'/10;
+        pf = pass;
+    end
+end
+
+% Add result
+results{size(results,1)+1,1} = '12';
+results{size(results,1),2} = 'Field Widths within 0.1 mm';
+results{size(results,1),3} = pf;
+
+%% TEST 13: MLC X Gamma Identical
+%
+% DESCRIPTION: This unit test compares the Gamma profile computed for the
+%   SNC IC Profiler Y-axis to an expected value, using a consistent set of
+%   Gamma criteria (3%/1mm) defined in unit test 9/10.  As such, this test
+%   verifies that the combination of reference extraction, measured
+%   extraction, and Gamma computation all function correctly.
+%
+% RELEVANT REQUIREMENTS: F025
+%
+% INPUT DATA: reference.gamma
+%
+% CONDITION A (+): Computed Y-axis Gamma profile is within 0.1
+
+% Retrieve guidata
+data = guidata(h);
+
+% In version >= 1.1.0, gamma is stored a a 2D array
+if version >= 010100
+
+    % If reference data exists
+    if nargin == 3
+
+        % If current value is within 0.1 for all profiles
+        if max(max(abs(data.h1gamma1(2:end,:) - ...
+                reference.gamma(2:end,:)))) < 0.1
+            pf = pass;
+
+        % Otherwise the test fails
+        else
+            pf = fail;
+        end
+
+    % Otherwise, no reference data exists
+    else
+
+        % Set current value as reference
+        reference.gamma = data.h1gamma1;
+        pf = pass;
+    end
+
+% Otherwise, values are stored as a cell array
+else
+    
+    % Start with pass
+    pf = pass;
+    
+    % Analyze each cell individually
+    for i = 2:length(data.h1gamma1)
+       
+        % If current value is within 0.1
+        if max(abs(data.h1gamma1{i} - reference.gamma(i,:))) >= 0.1
+            pf = fail;
+        end
+    end
+end
+
+% Add result
+results{size(results,1)+1,1} = '13';
+results{size(results,1),2} = 'Gamma within 0.1';
+results{size(results,1),3} = pf;
 
 %% Finish up
 % Close all figures

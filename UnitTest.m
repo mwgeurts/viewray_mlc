@@ -96,8 +96,8 @@ if nargin == 0
     % Declare location of test data. Column 1 is the name of the 
     % test suite, column 2 is the absolute path to the file(s)
     varargout{4} = {
-        'AP'     '../test_data/Head1_G90.txt'
-        'PA (thru couch)'     '../test_data/Head2_G180.txt'
+        'AP'                '../test_data/Head1_G90.txt'
+        'PA (thru couch)'   '../test_data/Head2_G180.txt'
         'PA (no couch)'     '../test_data/Head3_G270_through_back_of_ICP.txt'
     };
 
@@ -590,7 +590,6 @@ callback = get(data.h1browse1, 'Callback');
 % Set empty unit path/name
 data.unitpath = '';
 data.unitname = '';
-data.unitgantry = 2;
 
 % Force specific gamma criteria (3%/1mm)
 data.abs = 3;
@@ -639,13 +638,30 @@ catch
 	% The test passed
 end
 
-% Add file name to preamble
-preamble{length(preamble)+1} = ['| Input&nbsp;Data | ', varargin{2}, ' | '];
-
 % Set unit path/name
 [path, name, ext] = fileparts(varargin{2});
 data.unitpath = path;
 data.unitname = [name, ext];
+
+% Add file name to preamble
+preamble{length(preamble)+1} = ...
+    ['| Input&nbsp;Data | ', data.unitname, ' | '];
+
+% Search for the gantry angle in the name 
+tokens = regexp(name, 'G([0-9]+)', 'tokens');
+if ~isempty(tokens)
+    
+    % Set gantry angle based on file name specifier
+    data.unitgantry = floor(str2double(tokens{1})/90) + 1;
+
+% Otherwise assume angle is 90
+else
+    data.unitgantry = 2;
+end
+
+% Add file name to preamble
+preamble{length(preamble)+1} = ...
+    sprintf('| Gantry Angle | %i | ', 90*(data.unitgantry - 1));
 
 % Store guidata
 guidata(h, data);
@@ -951,7 +967,65 @@ results{size(results,1),3} = pf;
 %
 % CONDITION B (-): The minimum X1 offset differences does not equal 0
 %
-
+% CONDITION C (+): The maximum X1 offset differences are within 0.1 mm
+%
+% CONDITION D (-): The maximum X1 offset differences does not equal 0
+%
+% CONDITION E (+): The average X1 offset differences are within 0.1 mm
+%
+% CONDITION F (-): The average X1 offset differences does not equal 0
+%
+% CONDITION G (+): The minimum X2 offset differences are within 0.1 mm
+%
+% CONDITION H (-): The minimum X2 offset differences does not equal 0
+%
+% CONDITION I (+): The maximum X2 offset differences are within 0.1 mm
+%
+% CONDITION J (-): The maximum X2 offset differences does not equal 0
+%
+% CONDITION K (+): The average X2 offset differences are within 0.1 mm
+%
+% CONDITION L (-): The average X2 offset differences does not equal 0
+%
+% CONDITION M (+): The minimum of both offset differences are within 0.1 mm
+%
+% CONDITION N (-): The minimum of both offset differences does not equal 0
+%
+% CONDITION O (+): The maximum of both offset differences are within 0.1 mm
+%
+% CONDITION P (-): The maximum of both offset differences does not equal 0
+%
+% CONDITION Q (+): The average of both offset differences are within 0.1 mm
+%
+% CONDITION R (-): The average of both offset differences does not equal 0
+%
+% CONDITION S (+): The minimum FWHM differences are within 0.1 mm
+%
+% CONDITION T (-): The minimum FWHM differences does not equal 0
+%
+% CONDITION U (+): The maximum FWHM differences are within 0.1 mm
+%
+% CONDITION V (-): The maximum FWHM differences does not equal 0
+%
+% CONDITION W (+): The average FWHM differences are within 0.1 mm
+%
+% CONDITION X (-): The average FWHM differences does not equal 0
+%
+% CONDITION Y (+): The X1 percent less than 1 mm are within 0.1 mm
+%
+% CONDITION Z (-): The X1 percent less than 1 mm does not equal 0
+%
+% CONDITION AA (+): The X2 percent less than 1 mm are within 0.1 mm
+%
+% CONDITION AB (-): The X2 percent less than 1 mm does not equal 0
+%
+% CONDITION AC (+): The X1 & X2 percent less than 1 mm are within 0.1 mm
+%
+% CONDITION AD (-): The X1 & X2 percent less than 1 mm does not equal 0
+%
+% CONDITION AE (+): The max gamma index is within 0.1 mm
+%
+% CONDITION AF (-): The max gamma index does not equal 0
 
 % Retrieve guidata
 data = guidata(h);
@@ -961,37 +1035,37 @@ if nargin == 3
 
     % If current value equals the reference (within 0.1 mm)
     if abs(cell2mat(textscan(data.h1table.Data{1,2}, '%f')) - ...
-            reference.minX1offsets) < 0.1 && ...
+            cell2mat(reference.minX1offsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{1,3}, '%f')) - ...
-            reference.minX2offsets) < 0.1 && ...
+            cell2mat(reference.minX2offsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{1,4}, '%f')) - ...
-            reference.minbothoffsets) < 0.1 && ...
+            cell2mat(reference.minbothoffsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{2,2}, '%f')) - ...
-            reference.maxX1offsets) < 0.1 && ...
+            cell2mat(reference.maxX1offsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{2,3}, '%f')) - ...
-            reference.maxX2offsets) < 0.1 && ...
+            cell2mat(reference.maxX2offsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{2,4}, '%f')) - ...
-            reference.maxbothoffsets) < 0.1 && ...
+            cell2mat(reference.maxbothoffsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{3,2}, '%f')) - ...
-            reference.avgX1offsets) < 0.1 && ...
+            cell2mat(reference.avgX1offsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{3,3}, '%f')) - ...
-            reference.avgX2offsets) < 0.1 && ...
+            cell2mat(reference.avgX2offsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{3,4}, '%f')) - ...
-            reference.avgbothoffsets) < 0.1 && ...
+            cell2mat(reference.avgbothoffsets)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{4,2}, '%f')) - ...
-            reference.X1less1) < 0.1 && ...
+            cell2mat(reference.X1less1)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{4,3}, '%f')) - ...
-            reference.X2less1) < 0.1 && ...
+            cell2mat(reference.X2less1)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{4,4}, '%f')) - ...
-            reference.bothless1) < 0.1 && ...
+            cell2mat(reference.bothless1)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{5,4}, '%f')) - ...
-            reference.minFWHMdiffs) < 0.1 && ...
+            cell2mat(reference.minFWHMdiffs)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{6,4}, '%f')) - ...
-            reference.maxFWHMdiffs) < 0.1 && ...
+            cell2mat(reference.maxFWHMdiffs)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{7,4}, '%f')) - ...
-            reference.avgFWHMdiffs) < 0.1 && ...
+            cell2mat(reference.avgFWHMdiffs)) < 0.1 && ...
             abs(cell2mat(textscan(data.h1table.Data{9,4}, '%f')) - ...
-            reference.maxgamma) < 0.1
+            cell2mat(reference.maxgamma)) < 0.1
         pf = pass;
 
     % Otherwise, the test fails
@@ -1016,7 +1090,7 @@ if nargin == 3
             isequal(textscan(data.h1table.Data{5,4}, '%f'), z) || ...
             isequal(textscan(data.h1table.Data{6,4}, '%f'), z) || ...
             isequal(textscan(data.h1table.Data{7,4}, '%f'), z) || ...
-            isequal(textscan(data.h1table.Data{8,4}, '%f'), z)
+            isequal(textscan(data.h1table.Data{9,4}, '%f'), z)
         pf = fail;
     end
     clear z;
@@ -1038,7 +1112,7 @@ else
     reference.minFWHMdiffs = textscan(data.h1table.Data{5,4}, '%f');
     reference.maxFWHMdiffs = textscan(data.h1table.Data{6,4}, '%f');
     reference.avgFWHMdiffs = textscan(data.h1table.Data{7,4}, '%f');
-    reference.maxgamma = textscan(data.h1table.Data{8,4}, '%f');
+    reference.maxgamma = textscan(data.h1table.Data{9,4}, '%f');
     pf = pass;
 end
 

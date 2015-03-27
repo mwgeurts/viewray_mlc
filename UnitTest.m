@@ -1121,6 +1121,217 @@ results{size(results,1)+1,1} = '14';
 results{size(results,1),2} = 'Statistics within 0.1 mm';
 results{size(results,1),3} = pf;
 
+%% TEST 15: Other H1, H2, and H3 Browse Buttons Load Data Successfully
+%
+% DESCRIPTION: This unit test repeats test 9 on the callbacks for files 2,
+%   3, and 4 on H1 as well as all files on H2 and H3 to verify that those 
+%   GUI features are also functional.
+%
+% RELEVANT REQUIREMENTS: U010, U015
+%
+% INPUT DATA: PRM file to be loaded (varargin{2})
+%
+% CONDITION A (+): The callback for the H1 file 2 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION B (-): The H1 file 2 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION C (+): The H1 file 2 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION D (+): The callback for the H1 file 3 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION E (-): The H1 file 3 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION F (+): The H1 file 3 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION G (+): The callback for the H1 file 4 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION H (-): The H1 file 4 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION I (+): The H1 file 4 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION J (+): The callback for the H2 file 1 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION K (-): The H2 file 1 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION L (+): The H2 file 1 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION M (+): The callback for the H2 file 2 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION N (-): The H2 file 2 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION O (+): The H2 file 2 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION P (+): The callback for the H2 file 3 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION Q (-): The H2 file 3 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION R (+): The H2 file 3 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION S (+): The callback for the H2 file 4 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION T (-): The H2 file 4 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION U (+): The H2 file 4 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION V (+): The callback for the H3 file 1 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION W (-): The H3 file 1 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION X (+): The H3 file 1 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION Y (+): The callback for the H3 file 2 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION Z (-): The H3 file 2 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION AA (+): The H3 file 2 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION AB (+): The callback for the H3 file 3 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION AC (-): The H3 file 3 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION AD (+): The H3 file 3 callback will return without error when no 
+%   filename is provided
+%
+% CONDITION AE (+): The callback for the H3 file 4 browse button can be 
+%   executed without error when a valid filename is provided
+%
+% CONDITION AF (-): The H3 file 4 callback will throw an error if an invalid 
+%   filename is provided
+%
+% CONDITION AG (+): The H3 file 4 callback will return without error when no 
+%   filename is provided
+
+% Start with pass
+pf = pass;
+
+% Loop through the heads
+for i = 1:3
+   
+    % Loop through the files
+    for j = 1:4
+    
+        % If i & j == 1, skip (H1 file 1 was tested above)
+        if i == 1 && j == 1
+            continue;
+        end
+        
+        % Retrieve guidata
+        data = guidata(h);
+
+        % Retrieve callback to H2 browse button
+        callback = get(data.(sprintf('h%ibrowse%i', i, j)), 'Callback');
+
+        % Set empty unit path/name
+        data.unitpath = '';
+        data.unitname = '';
+
+        % Store guidata
+        guidata(h, data);
+
+        % Execute callback in try/catch statement
+        try
+            pf = pass;
+            callback(data.(sprintf('h%ibrowse%i', i, j)), data);
+
+        % If it errors, record fail
+        catch
+            pf = fail;
+        end
+
+        % Set invalid unit path/name
+        data.unitpath = '/';
+        data.unitname = 'asd';
+
+        % Store guidata
+        guidata(h, data);
+
+        % Execute callback in try/catch statement (this should fail)
+        try
+            callback(data.(sprintf('h%ibrowse%i', i, j)), data);
+            pf = fail;
+
+        % If it errors
+        catch
+            % The test passed
+        end
+
+        % Set unit path/name
+        [path, name, ext] = fileparts(varargin{2});
+        data.unitpath = path;
+        data.unitname = [name, ext];
+
+        % Search for the gantry angle in the name 
+        tokens = regexp(name, 'G([0-9]+)', 'tokens');
+        if ~isempty(tokens)
+
+            % Set gantry angle based on file name specifier
+            data.unitgantry = floor(str2double(tokens{1})/90) + 1;
+
+        % Otherwise assume angle is 90
+        else
+            data.unitgantry = 2;
+        end
+        
+        % Store guidata
+        guidata(h, data);
+
+        % Execute callback in try/catch statement
+        try
+            callback(data.(sprintf('h%ibrowse%i', i, j)), data);
+
+        % If it errors, record fail
+        catch
+            pf = fail;
+        end
+
+        % Retrieve guidata
+        data = guidata(h);
+
+        % Verify that the file name matches the input data
+        if strcmp(pf, pass) && strcmp(fullfile(varargin{2}), ...
+                data.(sprintf('h%ifile%i', i, j)).String)
+            pf = pass;
+        else
+            pf = fail;
+        end
+    end
+end
+
+% Add result
+results{size(results,1)+1,1} = '15';
+results{size(results,1),2} = ...
+    'Remaining Browse Buttons Load Data Successfully';
+results{size(results,1),3} = pf;
+
 %% Finish up
 % Close all figures
 close all force;

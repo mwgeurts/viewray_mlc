@@ -89,16 +89,16 @@ if nargin == 0
     % Declare prior version directories
     varargout{3} = {
         '../viewray_mlc-1.0'
-%       '../viewray_mlc-1.1'
-%        '../viewray_mlc-1.1.1'
+        '../viewray_mlc-1.1'
+        '../viewray_mlc-1.1.1'
     };
 
     % Declare location of test data. Column 1 is the name of the 
     % test suite, column 2 is the absolute path to the file(s)
     varargout{4} = {
         'AP'                '../test_data/Head1_G90.txt'
-%        'PA (thru couch)'   '../test_data/Head2_G180.txt'
-%        'PA (no couch)'     '../test_data/Head3_G270_through_back_of_ICP.txt'
+        'PA (thru couch)'   '../test_data/Head2_G180.txt'
+        'PA (no couch)'     '../test_data/Head3_G270_through_back_of_ICP.txt'
     };
 
     % Declare name of report file (will be appended by _R201XX.md based on 
@@ -590,6 +590,7 @@ callback = get(data.h1browse1, 'Callback');
 % Set empty unit path/name
 data.unitpath = '';
 data.unitname = '';
+data.unitgantry = 2;
 
 % Force specific gamma criteria (3%/1mm)
 data.abs = 3;
@@ -624,6 +625,7 @@ end
 % Set invalid unit path/name
 data.unitpath = '/';
 data.unitname = 'asd';
+data.unitgantry = 2;
 
 % Store guidata
 guidata(h, data);
@@ -1255,6 +1257,7 @@ for i = 1:3
         % Set empty unit path/name
         data.unitpath = '';
         data.unitname = '';
+        data.unitgantry = 2;
 
         % Store guidata
         guidata(h, data);
@@ -1272,6 +1275,7 @@ for i = 1:3
         % Set invalid unit path/name
         data.unitpath = '/';
         data.unitname = 'asd';
+        data.unitgantry = 2;
 
         % Store guidata
         guidata(h, data);

@@ -90,15 +90,15 @@ if nargin == 0
     varargout{3} = {
         '../viewray_mlc-1.0'
 %       '../viewray_mlc-1.1'
-        '../viewray_mlc-1.1.1'
+%        '../viewray_mlc-1.1.1'
     };
 
     % Declare location of test data. Column 1 is the name of the 
     % test suite, column 2 is the absolute path to the file(s)
     varargout{4} = {
         'AP'                '../test_data/Head1_G90.txt'
-        'PA (thru couch)'   '../test_data/Head2_G180.txt'
-        'PA (no couch)'     '../test_data/Head3_G270_through_back_of_ICP.txt'
+%        'PA (thru couch)'   '../test_data/Head2_G180.txt'
+%        'PA (no couch)'     '../test_data/Head3_G270_through_back_of_ICP.txt'
     };
 
     % Declare name of report file (will be appended by _R201XX.md based on 
@@ -1331,6 +1331,326 @@ results{size(results,1)+1,1} = '15';
 results{size(results,1),2} = ...
     'Remaining Browse Buttons Load Data Successfully';
 results{size(results,1),3} = pf;
+
+%% TEST 16/17/18: Figures Functional
+%
+% DESCRIPTION: This unit test tests the different options available in the
+%   plot display dropdown menu by executing the dropdown callback for all
+%   all options on each head.  In the positive condition of each case the 
+%   plot is attempted with result data present, while in the negative 
+%   condition the plot is attempted with no data present.  Note, this test 
+%   does also require the user to visually verify that the plot displays 
+%   correctly (and with the correct colors).
+%
+% RELEVANT REQUIREMENTS: U007, U011, U013, F014, F015, F016, F017, F020,
+%   F021, F022, F023, F026, F027, F028
+%
+% INPUT DATA: No input data required
+%
+% CONDITION A (+): The field edge offset differences are displayed when
+%   results data is present
+%
+% CONDITION B (-): The field edge offset differences are not displayed when
+%   results data is not present, and returns gracefully
+%
+% CONDITION C (+): The field width differences are displayed when
+%   results data is present
+%
+% CONDITION D (-): The field width differences are not displayed when
+%   results data is not present, and returns gracefully
+%
+% CONDITION E (+): The file 1 measured, reference, and gamma profiles are 
+%   displayed when results data is present
+%
+% CONDITION F (-): The file 1 measured, reference, and gamma profiles are 
+%   not displayed when results data is not present, and returns gracefully
+%
+% CONDITION G (+): The file 2 measured, reference, and gamma profiles are 
+%   displayed when results data is present
+%
+% CONDITION H (-): The file 2 measured, reference, and gamma profiles are 
+%   not displayed when results data is not present, and returns gracefully
+%
+% CONDITION I (+): The file 3 measured, reference, and gamma profiles are 
+%   displayed when results data is present
+%
+% CONDITION J (-): The file 3 measured, reference, and gamma profiles are 
+%   not displayed when results data is not present, and returns gracefully
+%
+% CONDITION K (+): The file 4 measured, reference, and gamma profiles are 
+%   displayed when results data is present
+%
+% CONDITION L (-): The file 4 measured, reference, and gamma profiles are 
+%   not displayed when results data is not present, and returns gracefully
+
+% Retrieve guidata
+data = guidata(h);
+    
+% Retrieve callback to H1 display dropdown
+callback = get(data.h1display, 'Callback');
+
+% Execute callbacks in try/catch statement
+try
+    
+    % Start with pass
+    pf = pass;
+    
+    % Loop through each display option
+    for i = 1:length(data.h1display.String)
+        
+        % Set value
+        data.h1display.Value = i;
+        guidata(h, data);
+        
+        % Execute callback
+        callback(data.h1display, data);
+
+        % Execute callback without file strings
+        data.h1file1.String = '';
+        data.h1file2.String = '';
+        data.h1file3.String = '';
+        data.h1file4.String = '';
+        callback(data.h1display, data); 
+    end
+    
+% If callback fails, record failure    
+catch
+    pf = fail; 
+end
+
+% Add result
+results{size(results,1)+1,1} = '16';
+results{size(results,1),2} = 'H1 Figure Display Functional';
+results{size(results,1),3} = pf;
+    
+% Retrieve callback to H2 display dropdown
+callback = get(data.h2display, 'Callback');
+
+% Execute callbacks in try/catch statement
+try
+    
+    % Start with pass
+    pf = pass;
+    
+    % Loop through each display option
+    for i = 1:length(data.h2display.String)
+        
+        % Set value
+        data.h2display.Value = i;
+        guidata(h, data);
+        
+        % Execute callback
+        callback(data.h2display, data);
+
+        % Execute callback without file strings
+        data.h2file1.String = '';
+        data.h2file2.String = '';
+        data.h2file3.String = '';
+        data.h2file4.String = '';
+        callback(data.h2display, data); 
+    end
+    
+% If callback fails, record failure    
+catch
+    pf = fail; 
+end
+
+% Add result
+results{size(results,1)+1,1} = '17';
+results{size(results,1),2} = 'H2 Figure Display Functional';
+results{size(results,1),3} = pf;
+
+% Retrieve guidata
+data = guidata(h);
+    
+% Retrieve callback to H3 display dropdown
+callback = get(data.h3display, 'Callback');
+
+% Execute callbacks in try/catch statement
+try
+    
+    % Start with pass
+    pf = pass;
+    
+    % Loop through each display option
+    for i = 1:length(data.h3display.String)
+        
+        % Set value
+        data.h3display.Value = i;
+        guidata(h, data);
+        
+        % Execute callback
+        callback(data.h3display, data);
+
+        % Execute callback without file strings
+        data.h3file1.String = '';
+        data.h3file2.String = '';
+        data.h3file3.String = '';
+        data.h3file4.String = '';
+        callback(data.h3display, data); 
+    end
+    
+% If callback fails, record failure    
+catch
+    pf = fail; 
+end
+
+% Add result
+results{size(results,1)+1,1} = '18';
+results{size(results,1),2} = 'H3 Figure Display Functional';
+results{size(results,1),3} = pf;
+
+%% TEST 19: Angle Can Be Pre-specified
+%
+% DESCRIPTION: This unit test validates the gantry angle drop down menu by
+% pre-selecting a gantry angle and re-loading each dataset. The gantry
+% angle is randomly selected this time. The negative condition for this
+% unit test is performed in tests 9 and 15.
+%
+% RELEVANT REQUIREMENTS: F005
+%
+% INPUT DATA: varargin{2}
+%
+% CONDITION A (+): The gantry angle is not requested if already selected
+%   from the dropdown menu
+%
+% CONDITION B (+): The data is loaded using the pre-selected reference data
+
+% Start with pass
+pf = pass;
+
+% Loop through the heads
+for i = 1:3
+   
+    % Loop through the files
+    for j = 1:4
+
+        % Set unit path/name
+        [path, name, ext] = fileparts(varargin{2});
+        data.unitpath = path;
+        data.unitname = [name, ext];
+        
+        % Make sure gantry unit test is disabled
+        if isfield(data, 'unitgantry')
+            data = rmfield(data, 'unitgantry');
+        end
+        
+        % Set gantry angle randomly this time
+        data.(sprintf('h%iangle%i', i, j)).Value = ...
+            floor(rand(1) * 3 + 2.5);
+        
+        % Store guidata
+        guidata(h, data);
+        
+        % Retrieve callback to head angle dropdown
+        callbackA = get(data.(sprintf('h%iangle%i', i, j)), 'Callback');
+
+        % Retrieve callback to head browse button
+        callbackB = get(data.(sprintf('h%ibrowse%i', i, j)), 'Callback');
+        
+        % Execute callbacks in try/catch statement
+        try
+            callbackA(data.(sprintf('h%iangle%i', i, j)), data);
+            callbackB(data.(sprintf('h%ibrowse%i', i, j)), data);
+
+        % If it errors, record fail
+        catch
+            pf = fail;
+        end
+    end
+end
+
+% Add result
+results{size(results,1)+1,1} = '19';
+results{size(results,1),2} = 'Angle Can Be Pre-selected';
+results{size(results,1),3} = pf;
+
+%% TEST 20/21: Print Report Functional
+%
+% DESCRIPTION: This unit test evaluates the print report feature by
+%   executing the print report button callback.  Note, the contents and 
+%   clarity of the report are verified manually by the user. This unit test
+%   is only applicable to Version 1.1.0 and later (when reports became 
+%   available).
+%
+% RELEVANT REQUIREMENTS: U016, F031, F032, F033, F034, F035, F036, F037
+%
+% INPUT DATA: No input data required
+%
+% CONDITION A (+): The print report button is enabled
+%
+% CONDITION B (+): A report is generated without error and with the user
+%   name (or "Unit test" if whoami does not exist), current date and time,
+%   SNC version/collector model/serial, field edge and fwhm difference 
+%   profiles, and statistics.
+%
+% CONDITION C (-): A report is generated if Head 1, 2, or 3 results do not
+%   exist without error.
+
+% If version >= 1.1.0
+if version >= 010100
+    
+    % Retrieve guidata
+    data = guidata(h);
+
+    % Retrieve callback to print button
+    callback = get(data.print_button, 'Callback');
+
+    % Execute callback in try/catch statement
+    try
+        % Start with pass
+        pf = pass;
+    
+        % Start timer
+        t = tic;
+        
+        % Execute callback
+        callback(data.print_button, data);
+    catch
+        
+        % If callback fails, record failure
+        pf = fail; 
+    end
+
+    % Record completion time
+    time = sprintf('%0.1f sec', toc(t)); 
+    
+    % If the print report button is disabled, the test fails
+    if ~strcmp(get(data.print_button, 'enable'), 'on')
+        pf = fail;
+    end
+    
+    % Execute callback in try/catch statement
+    try
+        
+        % Execute callback again, this time removing the data
+        callback(data.print_button, rmfield(data, ...
+            {'h1profiles1', 'h1profiles2', 'h1profiles3', 'h1profiles4', ...
+            'h2profiles1', 'h2profiles2', 'h2profiles3', 'h2profiles4', ...
+            'h3profiles1', 'h3profiles2', 'h3profiles3', 'h3profiles4'}));
+    catch
+        
+        % If callback fails, record failure
+        pf = fail; 
+    end
+
+% If version < 1.1.0
+else
+    
+    % This feature does not exist
+    pf = unk;
+    time = unk;
+end
+
+% Add result
+results{size(results,1)+1,1} = '20';
+results{size(results,1),2} = 'Print Report Functional';
+results{size(results,1),3} = pf;
+
+% Add result
+results{size(results,1)+1,1} = '21';
+results{size(results,1),2} = 'Print Report Time';
+results{size(results,1),3} = time;
 
 %% Finish up
 % Close all figures

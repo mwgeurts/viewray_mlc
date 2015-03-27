@@ -1125,9 +1125,11 @@ results{size(results,1),3} = pf;
 %
 % DESCRIPTION: This unit test repeats test 9 on the callbacks for files 2,
 %   3, and 4 on H1 as well as all files on H2 and H3 to verify that those 
-%   GUI features are also functional.
+%   GUI features are also functional.  This unit test also validates the 
+%   gantry angle drop down menu by pre-selecting a gantry angle. The gantry
+%   angle is randomly selected this time.
 %
-% RELEVANT REQUIREMENTS: U010, U015
+% RELEVANT REQUIREMENTS: U010, U015, F005
 %
 % INPUT DATA: PRM file to be loaded (varargin{2})
 %
@@ -1288,25 +1290,29 @@ for i = 1:3
         [path, name, ext] = fileparts(varargin{2});
         data.unitpath = path;
         data.unitname = [name, ext];
-
-        % Search for the gantry angle in the name 
-        tokens = regexp(name, 'G([0-9]+)', 'tokens');
-        if ~isempty(tokens)
-
-            % Set gantry angle based on file name specifier
-            data.unitgantry = floor(str2double(tokens{1})/90) + 1;
-
-        % Otherwise assume angle is 90
-        else
-            data.unitgantry = 2;
+        
+        % Make sure gantry unit test is disabled
+        if isfield(data, 'unitgantry')
+            data = rmfield(data, 'unitgantry');
         end
+        
+        % Set gantry angle randomly this time
+        data.(sprintf('h%iangle%i', i, j)).Value = ...
+            floor(rand(1) * 3 + 2.5);
         
         % Store guidata
         guidata(h, data);
+        
+        % Retrieve callback to head angle dropdown
+        callbackA = get(data.(sprintf('h%iangle%i', i, j)), 'Callback');
 
-        % Execute callback in try/catch statement
+        % Retrieve callback to head browse button
+        callbackB = get(data.(sprintf('h%ibrowse%i', i, j)), 'Callback');
+        
+        % Execute callbacks in try/catch statement
         try
-            callback(data.(sprintf('h%ibrowse%i', i, j)), data);
+            callbackA(data.(sprintf('h%iangle%i', i, j)), data);
+            callbackB(data.(sprintf('h%ibrowse%i', i, j)), data);
 
         % If it errors, record fail
         catch
@@ -1385,7 +1391,7 @@ results{size(results,1),3} = pf;
 
 % Retrieve guidata
 data = guidata(h);
-    
+
 % Retrieve callback to H1 display dropdown
 callback = get(data.h1display, 'Callback');
 
@@ -1404,13 +1410,6 @@ try
         
         % Execute callback
         callback(data.h1display, data);
-
-        % Execute callback without file strings
-        data.h1file1.String = '';
-        data.h1file2.String = '';
-        data.h1file3.String = '';
-        data.h1file4.String = '';
-        callback(data.h1display, data); 
     end
     
 % If callback fails, record failure    
@@ -1441,13 +1440,6 @@ try
         
         % Execute callback
         callback(data.h2display, data);
-
-        % Execute callback without file strings
-        data.h2file1.String = '';
-        data.h2file2.String = '';
-        data.h2file3.String = '';
-        data.h2file4.String = '';
-        callback(data.h2display, data); 
     end
     
 % If callback fails, record failure    
@@ -1459,9 +1451,6 @@ end
 results{size(results,1)+1,1} = '17';
 results{size(results,1),2} = 'H2 Figure Display Functional';
 results{size(results,1),3} = pf;
-
-% Retrieve guidata
-data = guidata(h);
     
 % Retrieve callback to H3 display dropdown
 callback = get(data.h3display, 'Callback');
@@ -1481,13 +1470,6 @@ try
         
         % Execute callback
         callback(data.h3display, data);
-
-        % Execute callback without file strings
-        data.h3file1.String = '';
-        data.h3file2.String = '';
-        data.h3file3.String = '';
-        data.h3file4.String = '';
-        callback(data.h3display, data); 
     end
     
 % If callback fails, record failure    
@@ -1500,72 +1482,7 @@ results{size(results,1)+1,1} = '18';
 results{size(results,1),2} = 'H3 Figure Display Functional';
 results{size(results,1),3} = pf;
 
-%% TEST 19: Angle Can Be Pre-specified
-%
-% DESCRIPTION: This unit test validates the gantry angle drop down menu by
-% pre-selecting a gantry angle and re-loading each dataset. The gantry
-% angle is randomly selected this time. The negative condition for this
-% unit test is performed in tests 9 and 15.
-%
-% RELEVANT REQUIREMENTS: F005
-%
-% INPUT DATA: varargin{2}
-%
-% CONDITION A (+): The gantry angle is not requested if already selected
-%   from the dropdown menu
-%
-% CONDITION B (+): The data is loaded using the pre-selected reference data
-
-% Start with pass
-pf = pass;
-
-% Loop through the heads
-for i = 1:3
-   
-    % Loop through the files
-    for j = 1:4
-
-        % Set unit path/name
-        [path, name, ext] = fileparts(varargin{2});
-        data.unitpath = path;
-        data.unitname = [name, ext];
-        
-        % Make sure gantry unit test is disabled
-        if isfield(data, 'unitgantry')
-            data = rmfield(data, 'unitgantry');
-        end
-        
-        % Set gantry angle randomly this time
-        data.(sprintf('h%iangle%i', i, j)).Value = ...
-            floor(rand(1) * 3 + 2.5);
-        
-        % Store guidata
-        guidata(h, data);
-        
-        % Retrieve callback to head angle dropdown
-        callbackA = get(data.(sprintf('h%iangle%i', i, j)), 'Callback');
-
-        % Retrieve callback to head browse button
-        callbackB = get(data.(sprintf('h%ibrowse%i', i, j)), 'Callback');
-        
-        % Execute callbacks in try/catch statement
-        try
-            callbackA(data.(sprintf('h%iangle%i', i, j)), data);
-            callbackB(data.(sprintf('h%ibrowse%i', i, j)), data);
-
-        % If it errors, record fail
-        catch
-            pf = fail;
-        end
-    end
-end
-
-% Add result
-results{size(results,1)+1,1} = '19';
-results{size(results,1),2} = 'Angle Can Be Pre-selected';
-results{size(results,1),3} = pf;
-
-%% TEST 20/21: Print Report Functional
+%% TEST 19/20: Print Report Functional
 %
 % DESCRIPTION: This unit test evaluates the print report feature by
 %   executing the print report button callback.  Note, the contents and 
@@ -1643,14 +1560,227 @@ else
 end
 
 % Add result
-results{size(results,1)+1,1} = '20';
+results{size(results,1)+1,1} = '19';
 results{size(results,1),2} = 'Print Report Functional';
 results{size(results,1),3} = pf;
 
 % Add result
-results{size(results,1)+1,1} = '21';
+results{size(results,1)+1,1} = '20';
 results{size(results,1),2} = 'Print Report Time';
 results{size(results,1),3} = time;
+
+%% TEST 21/22/23: Clear All Buttons Functional
+%
+% DESCRIPTION: This unit test evaluates the Clear All Data button on the
+%   user interface for each head and verifies that all data is successfully
+%   cleared from the user interface and internally.
+%
+% RELEVANT REQUIREMENTS: U017, F018, F019
+%
+% INPUT DATA: No input data required
+%
+% CONDITION A (-): Prior to executing the H1 clear button callback, the
+%   file location, plot dropdown menu, plot, statistics, and internal 
+%   variables contain data. 
+%
+% CONDITION B (+): After executing the H1 clear button, the file location, 
+%   plot dropdown menu, plot, statistics, and internal variables 
+%   become empty.
+%
+% CONDITION C (-): Prior to executing the H2 clear button callback, the
+%   file location, plot dropdown menu, plot, statistics, and internal 
+%   variables contain data. 
+%
+% CONDITION D (+): After executing the H2 clear button, the file location, 
+%   plot dropdown menu, plot, statistics, and internal variables 
+%   become empty.
+%
+% CONDITION E (-): Prior to executing the H3 clear button callback, the
+%   file location, plot dropdown menu, plot, statistics, and internal 
+%   variables contain data. 
+%
+% CONDITION F (+): After executing the H3 clear button, the file location, 
+%   plot dropdown menu, plot, statistics, and internal variables 
+%   become empty.
+
+% Retrieve guidata
+data = guidata(h);
+
+% Retrieve callback to H1 clear button
+callback = get(data.h1clear, 'Callback');
+
+% Start with pass
+pf = pass;
+
+% Verify file location, plot dropdown menu, plot, statistics, and internal 
+% variables exist
+for i = 1:4
+    if data.(sprintf('h1angle%i', i)).Value == 1 || ...
+            isempty(data.(sprintf('h1file%i', i)).String) || ...
+            isempty(data.(sprintf('h1profiles%i', i))) || ...
+            isempty(data.(sprintf('h1gamma%i', i))) || ...
+            isempty(data.h1table.Data{1,1}) || data.h1display.Value == 1 
+        pf = fail;
+    end
+end
+
+% Execute callback in try/catch statement
+try
+    
+    % Execute callback
+    callback(data.h1clear, h);
+catch
+    
+    % If callback fails, test fails
+    pf = fail;
+end
+
+% Retrieve guidata
+data = guidata(h);
+
+% Verify file location, plot dropdown menu, plot, statistics, and internal 
+% variables are now cleared
+for i = 1:4
+    if data.(sprintf('h1angle%i', i)).Value ~= 1 || ...
+            ~isempty(data.(sprintf('h1file%i', i)).String) || ...
+            ~isempty(data.(sprintf('h1profiles%i', i))) || ...
+            ~isempty(data.(sprintf('h1gamma%i', i))) || ...
+            ~isempty(data.h1table.Data{1,1}) || data.h1display.Value ~= 1 
+        pf = fail;
+    end
+end
+
+% Add result
+results{size(results,1)+1,1} = '21';
+results{size(results,1),2} = 'H1 Clear Button Functional';
+results{size(results,1),3} = pf;
+
+% Retrieve callback to H2 clear button
+callback = get(data.h2clear, 'Callback');
+
+% Start with pass
+pf = pass;
+
+% Verify file location, plot dropdown menu, plot, statistics, and internal 
+% variables exist
+for i = 1:4
+    if data.(sprintf('h2angle%i', i)).Value == 1 || ...
+            isempty(data.(sprintf('h2file%i', i)).String) || ...
+            isempty(data.(sprintf('h2profiles%i', i))) || ...
+            isempty(data.(sprintf('h2gamma%i', i))) || ...
+            isempty(data.h2table.Data{1,1}) || data.h2display.Value == 1 
+        pf = fail;
+    end
+end
+
+% Execute callback in try/catch statement
+try
+    
+    % Execute callback
+    callback(data.h2clear, h);
+catch
+    
+    % If callback fails, test fails
+    pf = fail;
+end
+
+% Retrieve guidata
+data = guidata(h);
+
+% Verify file location, plot dropdown menu, plot, statistics, and internal 
+% variables are now cleared
+for i = 1:4
+    if data.(sprintf('h2angle%i', i)).Value ~= 1 || ...
+            ~isempty(data.(sprintf('h2file%i', i)).String) || ...
+            ~isempty(data.(sprintf('h2profiles%i', i))) || ...
+            ~isempty(data.(sprintf('h2gamma%i', i))) || ...
+            ~isempty(data.h2table.Data{1,1}) || data.h2display.Value ~= 1 
+        pf = fail;
+    end
+end
+
+% Add result
+results{size(results,1)+1,1} = '22';
+results{size(results,1),2} = 'H2 Clear Button Functional';
+results{size(results,1),3} = pf;
+
+% Retrieve callback to H3 clear button
+callback = get(data.h3clear, 'Callback');
+
+% Start with pass
+pf = pass;
+
+% Verify file location, plot dropdown menu, plot, statistics, and internal 
+% variables exist
+for i = 1:4
+    if data.(sprintf('h3angle%i', i)).Value == 1 || ...
+            isempty(data.(sprintf('h3file%i', i)).String) || ...
+            isempty(data.(sprintf('h3profiles%i', i))) || ...
+            isempty(data.(sprintf('h3gamma%i', i))) || ...
+            isempty(data.h3table.Data{1,1}) || data.h3display.Value == 1 
+        pf = fail;
+    end
+end
+
+% Execute callback in try/catch statement
+try
+    
+    % Execute callback
+    callback(data.h3clear, h);
+catch
+    
+    % If callback fails, test fails
+    pf = fail;
+end
+
+% Retrieve guidata
+data = guidata(h);
+
+% Verify file location, plot dropdown menu, plot, statistics, and internal 
+% variables are now cleared
+for i = 1:4
+    if data.(sprintf('h3angle%i', i)).Value ~= 1 || ...
+            ~isempty(data.(sprintf('h3file%i', i)).String) || ...
+            ~isempty(data.(sprintf('h3profiles%i', i))) || ...
+            ~isempty(data.(sprintf('h3gamma%i', i))) || ...
+            ~isempty(data.h3table.Data{1,1}) || data.h3display.Value ~= 1 
+        pf = fail;
+    end
+end
+
+% Add result
+results{size(results,1)+1,1} = '23';
+results{size(results,1),2} = 'H3 Clear Button Functional';
+results{size(results,1),3} = pf;
+
+%% TEST 24: Documentation Exists
+%
+% DESCRIPTION: This unit test checks that a README file is present.  The
+% contents of the README are manually verified by the user.
+%
+% RELEVANT REQUIREMENTS: D001, D002, D003, D004
+%
+% INPUT DATA: No input data required
+%
+% CONDITION A (+): A file named README.md exists in the file directory.
+
+% Look for README.md
+fid = fopen('README.md', 'r');
+
+% If file handle was valid, record pass
+if fid >= 3
+    pf = pass;
+else
+    pf = fail;
+end
+
+% Close file handle
+fclose(fid);
+
+% Add result
+results{size(results,1)+1,1} = '24';
+results{size(results,1),2} = 'Documentation Exists';
+results{size(results,1),3} = pf;
 
 %% Finish up
 % Close all figures

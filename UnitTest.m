@@ -1131,7 +1131,7 @@ results{size(results,1),3} = pf;
 %   gantry angle drop down menu by pre-selecting a gantry angle. The gantry
 %   angle is randomly selected this time.
 %
-% RELEVANT REQUIREMENTS: U010, U015, F005
+% RELEVANT REQUIREMENTS: U004, U010, U015, F005
 %
 % INPUT DATA: PRM file to be loaded (varargin{2})
 %

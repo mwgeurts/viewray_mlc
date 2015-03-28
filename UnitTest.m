@@ -1494,7 +1494,8 @@ results{size(results,1),3} = pf;
 %   is only applicable to Version 1.1.0 and later (when reports became 
 %   available).
 %
-% RELEVANT REQUIREMENTS: U016, F031, F032, F033, F034, F035, F036, F037
+% RELEVANT REQUIREMENTS: U016, F031, F032, F033, F034, F035, F036, F037, 
+%   P003
 %
 % INPUT DATA: No input data required
 %
